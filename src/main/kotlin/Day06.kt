@@ -36,10 +36,7 @@ fun solve(thing: MutableList<Int>) : Int {
             thing[biggestIndex]++
         }
     }
-    knownConfigurations.forEachIndexed {index, list ->
-        if (list == thing) {
-            return (knownConfigurations.size - index)
-        }
-    }
+
+    return knownConfigurations.size - knownConfigurations.indexOf(thing)
     return counter
 }
