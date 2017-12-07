@@ -20,31 +20,33 @@ fun main(args: Array<String>) {
     val programMap = mutableMapOf<String, Program>()
     val createTime = measureTimeMillis {
         File("resources/day07.txt").bufferedReader().forEachLine {line ->
-            val tokenized = line.split(' ')
+            val tokens = line.split(' ')
             val childList = mutableListOf<Program>()
-            if (tokenized.size > 3) {
-                tokenized.drop(3).forEach {dirtyChild ->
+            if (tokens.size > 3) {
+                tokens.drop(3).forEach {dirtyChild ->
                     //Remove those annoying comma
                     val child = dirtyChild.filter {it != ','}
-                    if (child !in programMap) {
-                        programMap[child] = Program(child, children = mutableListOf())
-                    }
-                    childList.add(programMap[child]!!)
+                    childList.add(
+                            programMap.getOrPut(child) {
+                                Program(child, children = mutableListOf())
+                            }
+                    )
                 }
             }
-            val weight = tokenized[1].drop(1).dropLast(1).toInt()
-            if (tokenized[0] !in programMap) {
-                programMap[tokenized[0]] = Program(tokenized[0], children = mutableListOf())
+            val weight = tokens[1].drop(1).dropLast(1).toInt()
+
+            programMap.getOrPut(tokens[0]) {
+                Program(tokens[0], children = mutableListOf())
+            }.apply {
+                this.children.addAll(childList)
+                this.weight = weight
             }
-            val current = programMap[tokenized[0]]!!
-            current.children.addAll(childList)
-            current.weight = weight
         }
     }
     val part1Time = measureTimeMillis {
         //Part 1
         val nodesWithParents = programMap.flatMap {it.value.children}.map {it.name}
-        programMap.values.first {it.name !in nodesWithParents}.let {
+        programMap.values.single {it.name !in nodesWithParents}.let {
             println("Part 1: ${it.name}")
         }
     }
