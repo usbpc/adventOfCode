@@ -4,31 +4,25 @@ fun main(args: Array<String>) {
     val listOfInts = mutableListOf<Int>()
     File("resources/day06.txt").bufferedReader().useLines {lines ->
         lines.forEach {line ->
-            line.split("\t").forEach { word ->
+            line.split("\t").forEach {word ->
                 listOfInts.add(word.toInt())
             }
 
         }
     }
-
     println(solve(listOfInts))
 }
 
-fun solve(thing: MutableList<Int>) : Int {
+fun solve(thing: MutableList<Int>): Int {
+    if (thing.isEmpty()) throw IllegalArgumentException("Thing is not allowed to be empty!")
     val knownConfigurations = mutableSetOf<List<Int>>()
     var counter = 0
-    while (!knownConfigurations.contains(thing)) {
-        knownConfigurations.add(List(thing.size) {i-> thing[i] + 0} )
+    while (thing !in knownConfigurations) {
+        knownConfigurations.add(thing.toList())
         counter++
-        var biggestIndex = 0
 
-        var biggestNum = 0
-        thing.forEachIndexed {index, num ->
-            if (num > biggestNum) {
-                biggestNum = num
-                biggestIndex = index
-            }
-        }
+        var (biggestIndex, biggestNum) = thing.withIndex().maxBy {it.value}!!
+
         thing[biggestIndex] = 0
         while (biggestNum > 0) {
             biggestNum--
@@ -37,6 +31,6 @@ fun solve(thing: MutableList<Int>) : Int {
         }
     }
 
-    return knownConfigurations.size - knownConfigurations.indexOf(thing)
+    //return knownConfigurations.size - knownConfigurations.indexOf(thing)
     return counter
 }
