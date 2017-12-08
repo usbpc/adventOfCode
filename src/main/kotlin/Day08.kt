@@ -1,7 +1,7 @@
 import java.io.File
 
-class NeverNullMap<K, V>(private val backing: MutableMap<K, V> = mutableMapOf(), val default: () -> V): MutableMap<K, V> by backing {
-    override operator fun get(key: K): V = backing.getOrPut(key, default)
+class NeverNullMap<K, V>(private val default: () -> V) : MutableMap<K, V> by mutableMapOf() {
+    override operator fun get(key: K): V = this.getOrPut(key, default)
 }
 
 fun main(args: Array<String>) {
@@ -13,7 +13,7 @@ fun main(args: Array<String>) {
             "<=" to {x, y -> x <= y},
             "==" to {x, y -> x == y},
             "!=" to {x, y -> x != y}
-            )
+    )
     val lines = File("resources/day08.txt").readLines()
     var processMax = 0
     for (line in lines) {
