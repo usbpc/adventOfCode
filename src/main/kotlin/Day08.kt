@@ -1,9 +1,7 @@
 import java.io.File
 
-class NeverNullMap<K, V>(val default: () -> V) {
-    val innerMap = mutableMapOf<K, V>()
-    operator fun get(key: K): V = innerMap.getOrPut(key, default)
-    operator fun set(key: K, value: V) = innerMap.put(key, value)
+class NeverNullMap<K, V>(private val backing: MutableMap<K, V> = mutableMapOf(), val default: () -> V): MutableMap<K, V> by backing {
+    override operator fun get(key: K): V = backing.getOrPut(key, default)
 }
 
 fun main(args: Array<String>) {
@@ -26,9 +24,9 @@ fun main(args: Array<String>) {
             "dec" -> myMap[tokens[0]] -= tokens[2].toInt()
             else -> throw IllegalStateException("What does ${tokens[1]} mean?")
         }
-        processMax = maxOf(myMap.innerMap.maxBy {it.value}?.value ?: -1, processMax)
+        processMax = maxOf(myMap.maxBy {it.value}?.value ?: -1, processMax)
     }
-    val doneMax = myMap.innerMap.maxBy {it.value}?.value ?: -1
+    val doneMax = myMap.maxBy {it.value}?.value ?: -1
     println("Part 1: $doneMax")
     println("Part 2: $processMax")
 }
