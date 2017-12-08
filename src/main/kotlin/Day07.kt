@@ -65,5 +65,5 @@ fun main(args: Array<String>) {
             println("Part 2: ${unique.weight - diff}")
         } ?: println("That didn't go as planned!")
     }
-    println("Creating the datastructure took ${createTime}ms part 1 took ${part1Time}ms and part2 took ${part2Time}ms")
+    println("Creating the Tree took ${createTime}ms Part 1 took ${part1Time}ms and Part 2 took ${part2Time}ms")
 }
