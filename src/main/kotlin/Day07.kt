@@ -1,25 +1,41 @@
+import usbpc.aoc.inputgetter.AdventOfCode
 import java.io.File
-import kotlin.system.measureTimeMillis
 
-data class Program(val name: String, var weight: Int = -1, val children: MutableList<Program>) {
-    val subTowerWeight: Int
-        get() = weight + children.sumBy {it.subTowerWeight}
-    val subTowerSize: Int
-        get() {
-            var counter = 0
-            var crr = children.firstOrNull()
-            while (crr != null) {
-                counter++
-                crr = crr.children.firstOrNull()
+class Day07(override val adventOfCode: AdventOfCode) : Day {
+    data class Program(val name: String, var weight: Int = -1, val children: MutableList<Program>) {
+        val subTowerWeight: Int
+            get() = weight + children.sumBy {it.subTowerWeight}
+        val subTowerSize: Int
+            get() {
+                var counter = 0
+                var crr = children.firstOrNull()
+                while (crr != null) {
+                    counter++
+                    crr = crr.children.firstOrNull()
+                }
+                return counter
             }
-            return counter
-        }
-}
+    }
 
-fun main(args: Array<String>) {
-    val programMap = mutableMapOf<String, Program>()
-    val createTime = measureTimeMillis {
-        File("resources/day07.txt").bufferedReader().forEachLine {line ->
+    var part1: String? = null
+    var part2: Int? = null
+    override fun part1(): String {
+        if (part1 == null) {
+            solve()
+        }
+        return part1.toString()
+    }
+
+    override fun part2(): String {
+        if (part2 == null) {
+            solve()
+        }
+        return part2.toString()
+    }
+
+    private fun solve() {
+        val programMap = mutableMapOf<String, Program>()
+        adventOfCode.getInput(2017, 7).lines().forEach {line ->
             val tokens = line.split(' ')
             val childList = mutableListOf<Program>()
             if (tokens.size > 3) {
@@ -42,16 +58,9 @@ fun main(args: Array<String>) {
                 this.weight = weight
             }
         }
-    }
-    val part1Time = measureTimeMillis {
-        //Part 1
         val nodesWithParents = programMap.flatMap {it.value.children}.map {it.name}
-        programMap.values.single {it.name !in nodesWithParents}.let {
-            println("Part 1: ${it.name}")
-        }
-    }
-    val part2Time = measureTimeMillis {
-        //Part 2
+        part1 = programMap.values.single {it.name !in nodesWithParents}.name
+
         programMap.values.filter {program ->
             program.children.map {it.subTowerWeight}.let {
                 it.max() != it.min()
@@ -62,8 +71,7 @@ fun main(args: Array<String>) {
             }
             val common = minimum.children.first {it.subTowerWeight != unique.subTowerWeight}
             val diff = unique.subTowerWeight - common.subTowerWeight
-            println("Part 2: ${unique.weight - diff}")
-        } ?: println("That didn't go as planned!")
+            part2 = unique.weight - diff
+        } ?: throw IllegalStateException("There was no element in there?!")
     }
-    println("Creating the Tree took ${createTime}ms Part 1 took ${part1Time}ms and Part 2 took ${part2Time}ms")
 }

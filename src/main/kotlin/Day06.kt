@@ -1,36 +1,42 @@
+import usbpc.aoc.inputgetter.AdventOfCode
 import java.io.File
 
-fun main(args: Array<String>) {
-    val listOfInts = mutableListOf<Int>()
-    File("resources/day06.txt").bufferedReader().useLines {lines ->
-        lines.forEach {line ->
-            line.split("\t").forEach {word ->
-                listOfInts.add(word.toInt())
+class Day06(override val adventOfCode: AdventOfCode) : Day {
+    val input = adventOfCode.getInput(2017, 6).split('\t').map {it.toInt()}.toMutableList()
+    var part1: Int? = null
+    var part2: Int? = null
+    override fun part1(): String {
+        if (part1 == null) {
+            solve()
+        }
+        return part1.toString()
+    }
+
+    override fun part2(): String {
+        if (part2 == null) {
+            solve()
+        }
+        return part2.toString()
+    }
+    private fun solve() {
+        if (input.isEmpty()) throw IllegalArgumentException("Thing is not allowed to be empty!")
+        val knownConfigurations = mutableSetOf<List<Int>>()
+        var counter = 0
+        while (input !in knownConfigurations) {
+            knownConfigurations.add(input.toList())
+            counter++
+
+            var (biggestIndex, biggestNum) = input.withIndex().maxBy {it.value}!!
+
+            input[biggestIndex] = 0
+            while (biggestNum > 0) {
+                biggestNum--
+                biggestIndex = (biggestIndex + 1) % input.size
+                input[biggestIndex]++
             }
-
         }
+
+        part2 = knownConfigurations.size - knownConfigurations.indexOf(input)
+        part1 = counter
     }
-    println(solve(listOfInts))
-}
-
-fun solve(thing: MutableList<Int>): Int {
-    if (thing.isEmpty()) throw IllegalArgumentException("Thing is not allowed to be empty!")
-    val knownConfigurations = mutableSetOf<List<Int>>()
-    var counter = 0
-    while (thing !in knownConfigurations) {
-        knownConfigurations.add(thing.toList())
-        counter++
-
-        var (biggestIndex, biggestNum) = thing.withIndex().maxBy {it.value}!!
-
-        thing[biggestIndex] = 0
-        while (biggestNum > 0) {
-            biggestNum--
-            biggestIndex = (biggestIndex + 1) % thing.size
-            thing[biggestIndex]++
-        }
-    }
-
-    //return knownConfigurations.size - knownConfigurations.indexOf(thing)
-    return counter
 }
