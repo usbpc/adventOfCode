@@ -1,7 +1,12 @@
 import java.io.File
 
-class NeverNullMap<K, V>(private val default: () -> V) : MutableMap<K, V> by mutableMapOf() {
-    override operator fun get(key: K): V = this.getOrPut(key, default)
+class NeverNullMap<K, V> private constructor(private val backing: MutableMap<K, V>, val default: () -> V) :
+        MutableMap<K, V> by backing {
+
+    constructor(default: () -> V) : this(mutableMapOf(), default)
+
+    override operator fun get(key: K): V = backing.getOrPut(key, default)
+    operator fun set(key: K, value: V) = backing.put(key, value)
 }
 
 fun main(args: Array<String>) {
