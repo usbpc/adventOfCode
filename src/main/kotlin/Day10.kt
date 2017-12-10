@@ -14,18 +14,16 @@ class Day10(override val adventOfCode: AdventOfCode) : Day {
         val lengths = input.toByteArray().map {it.toInt()}.toMutableList()
         lengths.addAll(listOf(17, 31, 73, 47, 23))
         val chunks = List(256) {it}
-                .knot(lengths,64)
+                .knot(lengths, 64)
                 .chunked(16)
         val output = StringBuilder()
         chunks.forEach {chunk ->
-            var xor = 0
-            chunk.forEach {current ->
-                xor = xor xor current
+            var xored = 0
+            chunk.forEach {number ->
+                xored = xored xor number
             }
-            if (xor.toString(16).length < 2) {
-                output.append("0")
-            }
-            output.append(xor.toString(16))
+
+            output.append(xored.toString(16).padStart(2, '0'))
         }
         return output.toString()
     }
@@ -36,15 +34,13 @@ class Day10(override val adventOfCode: AdventOfCode) : Day {
         var skipSize = 0
         for (counter in 1..rounds) {
             for (number in lengths) {
-                if (number > list.size)
-                    continue
+                if (number > list.size) continue
+
                 val reversedPart = List(number) {list[(currentPosition + it) % list.size]}.reversed()
                 reversedPart.forEachIndexed {index, thing ->
                     list[(currentPosition + index) % list.size] = thing
                 }
-                //println("$list skip: $skipSize length: $number pos: $currentPosition")
-                currentPosition = (currentPosition + number + skipSize) % list.size
-                skipSize++
+                currentPosition = (currentPosition + number + skipSize++) % list.size
             }
         }
         return list
