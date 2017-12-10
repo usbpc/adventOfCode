@@ -11,10 +11,10 @@ class Day10(override val adventOfCode: AdventOfCode) : Day {
     }
 
     override fun part2(): String {
+        val lengths = input.toByteArray().map {it.toInt()}.toMutableList()
+        lengths.addAll(listOf(17, 31, 73, 47, 23))
         val chunks = List(256) {it}
-                .knot(
-                        input.toByteArray().map {it.toInt()}.toMutableList().apply {addAll(listOf(17, 31, 73, 47, 23))},
-                        64)
+                .knot(lengths,64)
                 .chunked(16)
         val output = StringBuilder()
         chunks.forEach {chunk ->
