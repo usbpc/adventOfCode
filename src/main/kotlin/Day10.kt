@@ -11,19 +11,21 @@ class Day10(override val adventOfCode: AdventOfCode) : Day {
     override fun part2(): String {
         val lengths = input.toByteArray().map {it.toInt()}.toMutableList()
         lengths.addAll(listOf(17, 31, 73, 47, 23))
-        val chunks = IntArray(256) {it}
+        return IntArray(256) {it}
                 .knot(lengths, 64)
                 .asIterable()
                 .chunked(16)
-        val output = StringBuilder()
-        chunks.forEach {chunk ->
-            var xored = 0
-            chunk.forEach {number ->
-                xored = xored xor number
-            }
-            output.append(xored.toString(16).padStart(2, '0'))
+                .map {it.fold(0){acc, curr -> acc xor curr}}
+                .map {it.toString(16).padStart(2, '0')}
+                .collect(StringBuilder()) {item -> append(item)}
+                .toString()
+    }
+
+    inline fun <T, R> Iterable<T>.collect(obj: R, appender: R.(T) -> Unit): R {
+        this.forEach {
+            obj.appender(it)
         }
-        return output.toString()
+        return obj
     }
 
     private fun IntArray.knot(lengths: List<Int>, rounds: Int): IntArray {
@@ -31,10 +33,10 @@ class Day10(override val adventOfCode: AdventOfCode) : Day {
         var currentPosition = 0
         var skipSize = 0
         var tmp: Int
-        repeat (rounds) {
+        repeat(rounds) {
             for (number in lengths) {
                 if (number > list.size) continue
-                for (curr in 0 until number/2) {
+                for (curr in 0 until number / 2) {
                     tmp = list[(currentPosition + curr) % list.size]
                     list[(currentPosition + curr) % list.size] = list[(currentPosition + number - 1 - curr) % list.size]
                     list[(currentPosition + number - 1 - curr) % list.size] = tmp
