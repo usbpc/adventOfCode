@@ -2,8 +2,6 @@ import usbpc.aoc.inputgetter.AdventOfCode
 
 class Day10(override val adventOfCode: AdventOfCode) : Day {
     val input = adventOfCode.getInput(2017, 10)
-    var part1: String? = null
-    var part2: String? = null
 
     override fun part1(): String {
         val modified = List(256) {it}.knot(input.split(',').map {it.toInt()}, 1)
