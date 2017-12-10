@@ -1,7 +1,8 @@
-import usbpc.aoc.inputgetter.AdventOfCode
-import java.io.File
+import xyz.usbpc.aoc.inputgetter.AdventOfCode
+import xyz.usbpc.aoc.Day
 
 class Day08(override val adventOfCode: AdventOfCode) : Day {
+    override val day: Int = 8
     class NeverNullMap<K, V> private constructor(private val backing: MutableMap<K, V>, val default: () -> V) :
             MutableMap<K, V> by backing {
 

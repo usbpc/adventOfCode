@@ -1,7 +1,8 @@
-import usbpc.aoc.inputgetter.AdventOfCode
-import java.io.File
+import xyz.usbpc.aoc.inputgetter.AdventOfCode
+import xyz.usbpc.aoc.Day
 
 class Day07(override val adventOfCode: AdventOfCode) : Day {
+    override val day: Int = 7
     data class Program(val name: String, var weight: Int = -1, val children: MutableList<Program>) {
         val subTowerWeight: Int
             get() = weight + children.sumBy {it.subTowerWeight}

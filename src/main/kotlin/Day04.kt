@@ -1,6 +1,8 @@
-import usbpc.aoc.inputgetter.AdventOfCode
+import xyz.usbpc.aoc.inputgetter.AdventOfCode
+import xyz.usbpc.aoc.Day
 
 class Day04(override val adventOfCode: AdventOfCode) : Day {
+    override val day: Int = 4
     val input = adventOfCode.getInput(2017, 4).lines()
     override fun part1() = input.filter {it.isValidPassphrase()}.count().toString()
 

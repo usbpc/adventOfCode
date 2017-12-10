@@ -1,7 +1,8 @@
-import usbpc.aoc.inputgetter.AdventOfCode
-import java.io.File
+import xyz.usbpc.aoc.inputgetter.AdventOfCode
+import xyz.usbpc.aoc.Day
 
 class Day06(override val adventOfCode: AdventOfCode) : Day {
+    override val day: Int = 6
     val input = adventOfCode.getInput(2017, 6).split('\t').map {it.toInt()}.toMutableList()
     var part1: Int? = null
     var part2: Int? = null

@@ -1,6 +1,8 @@
-import usbpc.aoc.inputgetter.AdventOfCode
+import xyz.usbpc.aoc.inputgetter.AdventOfCode
+import xyz.usbpc.aoc.Day
 
 class Day09(override val adventOfCode: AdventOfCode) : Day {
+    override val day: Int = 9
     enum class State {
         GARBAGE, ESCAPED, NORMAL
     }

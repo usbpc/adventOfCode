@@ -1,7 +1,9 @@
-import usbpc.aoc.inputgetter.AdventOfCode
+import xyz.usbpc.aoc.inputgetter.AdventOfCode
+import xyz.usbpc.aoc.Day
 import kotlin.math.abs
 
 class Day03(override val adventOfCode: AdventOfCode) : Day {
+    override val day: Int = 3
     val input = adventOfCode.getInput(2017, 3).toInt()
     override fun part1() = getManhattanDistanceToCenter(getCoordinatesForAdress(input)).toString()
     override fun part2() = aWalkInThePark(347991).toString()

@@ -1,4 +1,4 @@
-package usbpc.aoc.inputgetter
+package xyz.usbpc.aoc.inputgetter
 
 import okhttp3.OkHttpClient
 import okhttp3.Request

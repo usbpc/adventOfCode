@@ -1,6 +1,8 @@
-import usbpc.aoc.inputgetter.AdventOfCode
+import xyz.usbpc.aoc.inputgetter.AdventOfCode
+import xyz.usbpc.aoc.Day
 
 class Day05(override val adventOfCode: AdventOfCode) : Day {
+    override val day: Int = 5
     val input = adventOfCode.getInput(2017, 5).lines().map {it.toInt()}
     override fun part1(): String {
         val inputCopy = input.toTypedArray()

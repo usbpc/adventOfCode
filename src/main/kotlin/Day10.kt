@@ -1,6 +1,9 @@
-import usbpc.aoc.inputgetter.AdventOfCode
+import xyz.usbpc.aoc.inputgetter.AdventOfCode
+import xyz.usbpc.aoc.Day
+import xyz.usbpc.utils.collect
 
 class Day10(override val adventOfCode: AdventOfCode) : Day {
+    override val day: Int = 10
     val input = adventOfCode.getInput(2017, 10)
 
     override fun part1(): String {
@@ -15,17 +18,10 @@ class Day10(override val adventOfCode: AdventOfCode) : Day {
                 .knot(lengths, 64)
                 .asIterable()
                 .chunked(16)
-                .map {it.fold(0){acc, curr -> acc xor curr}}
+                .map {it.fold(0) {acc, curr -> acc xor curr}}
                 .map {it.toString(16).padStart(2, '0')}
                 .collect(StringBuilder()) {item -> append(item)}
                 .toString()
-    }
-
-    inline fun <T, R> Iterable<T>.collect(obj: R, appender: R.(T) -> Unit): R {
-        this.forEach {
-            obj.appender(it)
-        }
-        return obj
     }
 
     private fun IntArray.knot(lengths: List<Int>, rounds: Int): IntArray {

@@ -1,6 +1,8 @@
-import usbpc.aoc.inputgetter.AdventOfCode
+import xyz.usbpc.aoc.inputgetter.AdventOfCode
+import xyz.usbpc.aoc.Day
 
 class Day02(override val adventOfCode: AdventOfCode) : Day {
+    override val day: Int = 2
     private val input: List<List<Long>>
     init {
         val tmp: MutableList<List<Long>> = mutableListOf()

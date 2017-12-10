@@ -1,6 +1,8 @@
-import usbpc.aoc.inputgetter.AdventOfCode
+import xyz.usbpc.aoc.inputgetter.AdventOfCode
+import xyz.usbpc.aoc.Day
 
 class Day01(override val adventOfCode: AdventOfCode): Day {
+    override val day: Int = 1
     private val input: String = adventOfCode.getInput(2017, 1)
     private fun countWithOffset(offset: Int): Int {
         var output = 0
