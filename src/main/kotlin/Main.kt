@@ -14,6 +14,7 @@ fun main(args: Array<String>) {
         add(Day08(adventOfCode))
         add(Day09(adventOfCode))
         add(Day10(adventOfCode))
+        add(Day11(adventOfCode))
     }
     if (args.isEmpty()) {
         println("Please specify session id!")
@@ -21,10 +22,9 @@ fun main(args: Array<String>) {
     }
 
     list.forEach {day ->
-        println("""-------------- Day ${day.day.toString().padStart(2, '0')} --------------
+        println("""---------------- Day ${day.day.toString().padStart(2, '0')} ----------------
         |Part 1: ${day.part1()}
         |Part 2: ${day.part2()}
     """.trimMargin())
     }
-
 }
