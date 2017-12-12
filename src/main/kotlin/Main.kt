@@ -1,10 +1,11 @@
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
+import kotlin.system.measureTimeMillis
 
 fun main(args: Array<String>) {
     val adventOfCode = AdventOfCode(args[0])
     val list = mutableListOf<Day>().apply {
-        /*add(Day01(adventOfCode))
+        add(Day01(adventOfCode))
         add(Day02(adventOfCode))
         add(Day03(adventOfCode))
         add(Day04(adventOfCode))
@@ -14,18 +15,20 @@ fun main(args: Array<String>) {
         add(Day08(adventOfCode))
         add(Day09(adventOfCode))
         add(Day10(adventOfCode))
-        add(Day11(adventOfCode))*/
+        add(Day11(adventOfCode))
         add(Day12(adventOfCode))
     }
     if (args.isEmpty()) {
         println("Please specify session id!")
         return
     }
-
     list.forEach {day ->
-        println("""---------------- Day ${day.day.toString().padStart(2, '0')} ----------------
-        |Part 1: ${day.part1()}
-        |Part 2: ${day.part2()}
-    """.trimMargin())
+        val stringBuilder = StringBuilder()
+        stringBuilder.appendln("---------------- Day ${day.day.toString().padStart(2, '0')} ----------------")
+        val first = measureTimeMillis {stringBuilder.appendln("Part 1: ${day.part1()}")}
+        val second = measureTimeMillis {stringBuilder.appendln("Part 2: ${day.part2()}")}
+        stringBuilder.appendln("Part 1 took ${first}ms, Part 2 took ${second}ms")
+        print(stringBuilder.toString())
     }
+
 }
