@@ -4,7 +4,7 @@ import xyz.usbpc.aoc.inputgetter.AdventOfCode
 fun main(args: Array<String>) {
     val adventOfCode = AdventOfCode(args[0])
     val list = mutableListOf<Day>().apply {
-        add(Day01(adventOfCode))
+        /*add(Day01(adventOfCode))
         add(Day02(adventOfCode))
         add(Day03(adventOfCode))
         add(Day04(adventOfCode))
@@ -14,7 +14,8 @@ fun main(args: Array<String>) {
         add(Day08(adventOfCode))
         add(Day09(adventOfCode))
         add(Day10(adventOfCode))
-        add(Day11(adventOfCode))
+        add(Day11(adventOfCode))*/
+        add(Day12(adventOfCode))
     }
     if (args.isEmpty()) {
         println("Please specify session id!")
