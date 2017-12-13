@@ -14,13 +14,13 @@ class Day13(override val adventOfCode: AdventOfCode) : Day {
             .map {(layer, depth) -> FirewallLayer(layer, depth)}
 
     override fun part1(): String = input
-            .filter {(layer, depth) -> layer % (2 * (depth - 2) + 2) == 0}
+            .filter {(layer, depth) -> layer % (2 * (depth - 1)) == 0}
             .fold(0) {acc, (layer, depth) -> acc + layer * depth}
             .toString()
 
     override fun part2(): String = generateSequence(0) {it + 1}
             .first {delay ->
-                input.none {(layer, depth) -> (layer + delay) % (2 * (depth - 2) + 2) == 0}
+                input.none {(layer, depth) -> (layer + delay) % (2 * (depth - 1)) == 0}
             }
             .toString()
 }
