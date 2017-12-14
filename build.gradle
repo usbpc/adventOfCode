@@ -11,16 +11,23 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
-
 apply plugin: 'kotlin'
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:0.19.2"
     compile 'com.squareup.okhttp3:okhttp:3.9.1'
+}
+
+kotlin {
+    experimental {
+        coroutines 'enable'
+    }
 }
 
 compileKotlin {
