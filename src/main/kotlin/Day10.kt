@@ -12,13 +12,14 @@ class Day10(override val adventOfCode: AdventOfCode) : Day {
     }
 
     override fun part2(): String {
-        return input.knotSparseHash()
+        return input.knotDenseHash()
                 .map {it.toString(16).padStart(2, '0')}.collect(StringBuilder(), StringBuilder::append).toString()
     }
 
 
 }
-fun String.knotSparseHash() = IntArray(256){it}.knot(this.toByteArray().map {it.toInt()} + listOf(17, 31, 73, 47, 23), 64)
+
+fun String.knotDenseHash() = IntArray(256){it}.knot(this.toByteArray().map {it.toInt()} + listOf(17, 31, 73, 47, 23), 64)
         .asIterable()
         .chunked(16)
         .map {it.fold(0) {acc, curr -> acc xor curr}}

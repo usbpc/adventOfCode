@@ -5,7 +5,6 @@ import xyz.usbpc.utils.Queue
 class Day14(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 14
     private val input = adventOfCode.getInput(2017, day)
-    private val testInput = "flqrgnkx"
 
     override fun part1(): String = input.getMemoryMap().flatMap {it.asIterable()}.sumBy {if(it) 1 else 0}.toString()
 
@@ -33,7 +32,7 @@ class Day14(override val adventOfCode: AdventOfCode) : Day {
 
     private fun String.getMemoryMap(): Array<BooleanArray> =
             Array(128) { x->
-                val hash = ("$this-$x").knotSparseHash()
+                val hash = ("$this-$x").knotDenseHash()
                 hash.flatMap {b ->
                     var byte = b
                     val out = BooleanArray(8)
