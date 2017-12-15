@@ -1,6 +1,5 @@
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
-import xyz.usbpc.utils.constrainCount
 
 class Day15(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 15
@@ -15,7 +14,7 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
         val genB = generateSequence((input[1] * 48271L) % 2147483647L) {(it * 48271L) % 2147483647L}.constrainOnce()
 
         return (genA zip genB)
-                .constrainCount(40_000_000)
+                .take(40_000_000)
                 .filter {(numA, numB) -> numA % 65536L == numB % 65536L}
                 .count()
                 .toString()
@@ -35,7 +34,7 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
             prev
         }
         return (genA zip genB)
-                .constrainCount(5_000_000)
+                .take(5_000_000)
                 .filter {(numA, numB) -> numA % 65536L == numB % 65536L}
                 .count()
                 .toString()
