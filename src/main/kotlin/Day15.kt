@@ -33,6 +33,7 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
                 prev = ((prev * 48271L) % 2147483647L)
             prev
         }
+
         return (genA zip genB)
                 .take(5_000_000)
                 .filter {(numA, numB) -> numA % 65536L == numB % 65536L}
