@@ -5,7 +5,7 @@ import kotlin.system.measureTimeMillis
 fun main(args: Array<String>) {
     val adventOfCode = AdventOfCode(args[0])
     val list = mutableListOf<Day>().apply {
-        add(Day01(adventOfCode))
+        /*add(Day01(adventOfCode))
         add(Day02(adventOfCode))
         add(Day03(adventOfCode))
         add(Day04(adventOfCode))
@@ -20,7 +20,8 @@ fun main(args: Array<String>) {
         add(Day13(adventOfCode))
         add(Day14(adventOfCode))
         add(Day15(adventOfCode))
-        add(Day16(adventOfCode))
+        add(Day16(adventOfCode))*/
+        add(Day17(adventOfCode))
     }
     if (args.isEmpty()) {
         println("Please specify session id!")
