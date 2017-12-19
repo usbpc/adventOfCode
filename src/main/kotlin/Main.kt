@@ -21,8 +21,9 @@ fun main(args: Array<String>) {
         add(Day14(adventOfCode))
         add(Day15(adventOfCode))
         add(Day16(adventOfCode))
-        add(Day17(adventOfCode))*/
-        add(Day18(adventOfCode))
+        add(Day17(adventOfCode))
+        add(Day18(adventOfCode))*/
+        add(Day19(adventOfCode))
     }
     if (args.isEmpty()) {
         println("Please specify session id!")

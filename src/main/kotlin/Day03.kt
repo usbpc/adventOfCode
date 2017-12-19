@@ -1,5 +1,6 @@
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
 import xyz.usbpc.aoc.Day
+import xyz.usbpc.utils.Direction
 import kotlin.math.abs
 
 class Day03(override val adventOfCode: AdventOfCode) : Day {
@@ -112,10 +113,6 @@ class Day03(override val adventOfCode: AdventOfCode) : Day {
 
     data class Coordinates(val x: Int, val y: Int) {
         override fun toString() = "($x, $y)"
-    }
-
-    enum class Direction {
-        UP, DOWN, LEFT, RIGHT
     }
 
     class GridDataStructure {
