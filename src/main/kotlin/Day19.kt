@@ -19,7 +19,7 @@ class Day19(override val adventOfCode: AdventOfCode) : Day {
 
     private inline fun runTroughMaze(collector: (Char) -> Unit) {
         var row = 0
-        var col = input.first().withIndex().find {(i, c) -> c == '|'}?.index ?:
+        var col = input.first().withIndex().find {(_, c) -> c == '|'}?.index ?:
                 throw IllegalStateException("No entrance")
         var dir = Direction.DOWN
         var symbol: Char
