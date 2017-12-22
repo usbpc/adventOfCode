@@ -1,6 +1,9 @@
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
 import xyz.usbpc.utils.collect
+import java.awt.image.BufferedImage
+import java.io.File
+import javax.imageio.ImageIO
 
 class Day21(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 21
@@ -12,6 +15,8 @@ class Day21(override val adventOfCode: AdventOfCode) : Day {
         repeat(5) {
             grid = grid.enhance()
         }
+        ImageIO.write(grid.toImage(), "png", File("part1.png"))
+        println(grid.prettyString())
         return grid.flatMap { it }.filter { it == '#' }.count().toString()
     }
 
@@ -20,9 +25,18 @@ class Day21(override val adventOfCode: AdventOfCode) : Day {
         repeat(18) {
             grid = grid.enhance()
         }
+        ImageIO.write(grid.toImage(), "png", File("part2.png"))
         return grid.flatMap { it }.filter { it == '#' }.count().toString()
     }
-
+    private fun List<List<Char>>.toImage(): BufferedImage {
+        val image = BufferedImage(this.size, this.size, BufferedImage.TYPE_BYTE_GRAY)
+        this.withIndex().forEach{(row, line) ->
+            line.withIndex().forEach { (col, char) ->
+                image.setRGB(row, col, if (char == '.') 0xFFFFFF else 0x000000)
+            }
+        }
+        return image
+    }
     /**
      * Input List has to be squared otherwies you'll get IndexOutOfBounds Exceptions
      * @return a new rotated list
