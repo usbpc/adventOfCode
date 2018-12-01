@@ -11,24 +11,18 @@ class Day01(override val adventOfCode: AdventOfCode) : Day {
     }
 
     override fun part2(): String {
-        val repInput = sequence {
-            var start = 0L
+        val known = mutableSetOf<Long>()
+
+            var curr = 0L
             var index = 0
 
             while (true) {
-                yield(start)
-                start += input[index]
+                if (!known.add(curr))
+                    break
+                curr += input[index]
                 index = (index + 1) % input.size
             }
-        }
 
-        val known = mutableSetOf<Long>()
-
-        for (i in repInput) {
-            if (!known.add(i))
-                return "" + i
-        }
-
-        return ""
+        return "" + curr
     }
 }
