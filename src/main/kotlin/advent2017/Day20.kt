@@ -1,7 +1,8 @@
+package advent2017
+
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
 import java.util.*
-import kotlin.NoSuchElementException
 import kotlin.math.abs
 
 class Day20(override val adventOfCode: AdventOfCode) : Day {

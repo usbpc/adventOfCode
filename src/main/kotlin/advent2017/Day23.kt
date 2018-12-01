@@ -1,3 +1,5 @@
+package advent2017
+
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
 
@@ -6,7 +8,7 @@ class Day23(override val adventOfCode: AdventOfCode) : Day {
     private val input = adventOfCode.getInput(2017, day).lines().map{ it.split(' ')}
 
     override fun part1(): String {
-        val registers = Day08.NeverNullMap<String, Long>{0}
+        val registers = Day08.NeverNullMap<String, Long> { 0 }
         var ins = 0
         var counter = 0L
         loop@while (true) {

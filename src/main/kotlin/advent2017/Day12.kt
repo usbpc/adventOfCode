@@ -1,3 +1,5 @@
+package advent2017
+
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
 import xyz.usbpc.utils.Queue

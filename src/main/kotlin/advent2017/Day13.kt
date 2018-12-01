@@ -1,3 +1,5 @@
+package advent2017
+
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
 
@@ -11,7 +13,7 @@ class Day13(override val adventOfCode: AdventOfCode) : Day {
                         ?.map {it?.value?.toInt()}
                         ?.requireNoNulls()
             }.requireNoNulls()
-            .map {(layer, depth) -> FirewallLayer(layer, depth)}
+            .map {(layer, depth) -> FirewallLayer(layer, depth) }
 
     override fun part1(): String = input
             .filter {(layer, depth) -> layer % (2 * (depth - 1)) == 0}

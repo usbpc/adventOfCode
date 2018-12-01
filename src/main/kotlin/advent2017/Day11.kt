@@ -1,3 +1,5 @@
+package advent2017
+
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
 import kotlin.math.abs
@@ -37,24 +39,24 @@ class Day11(override val adventOfCode: AdventOfCode) : Day {
 
         fun walk(direction: Direction) {
             when (direction) {
-                Day11.Direction.NORTH -> y++
-                Day11.Direction.SOUTH -> y--
-                Day11.Direction.NORTH_EAST -> {
+                Direction.NORTH -> y++
+                Direction.SOUTH -> y--
+                Direction.NORTH_EAST -> {
                     if (x++ % 2 == 0) {
                         y++
                     }
                 }
-                Day11.Direction.SOUTH_EAST -> {
+                Direction.SOUTH_EAST -> {
                     if (x++ % 2 != 0) {
                         y--
                     }
                 }
-                Day11.Direction.NORTH_WEST -> {
+                Direction.NORTH_WEST -> {
                     if (x-- % 2 == 0) {
                         y++
                     }
                 }
-                Day11.Direction.SOUTH_WEST -> {
+                Direction.SOUTH_WEST -> {
                     if (x-- % 2 != 0) {
                         y--
                     }
@@ -65,7 +67,7 @@ class Day11(override val adventOfCode: AdventOfCode) : Day {
     }
 
     override val day: Int = 11
-    private val input = adventOfCode.getInput(2017, 11).split(',').map {Direction.getByShortName(it)}
+    private val input = adventOfCode.getInput(2017, 11).split(',').map { Direction.getByShortName(it) }
 
     override fun part1(): String {
         return HexWalker(0, 0).apply {

@@ -1,17 +1,19 @@
-import kotlinx.coroutines.experimental.channels.Channel
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.newSingleThreadContext
+package advent2017
+
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.newSingleThreadContext
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.math.abs
 
 class Day18(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 18
     private val input = adventOfCode.getInput(2017, day).lines().map {it.split(' ')}
 
     override fun part1(): String {
-        val registers = Day08.NeverNullMap<String, Long> {0}
+        val registers = Day08.NeverNullMap<String, Long> { 0 }
         var lastSoundPlayed = 0L
         var instruction = 0
 
@@ -66,10 +68,12 @@ class Day18(override val adventOfCode: AdventOfCode) : Day {
         val channel = arrayOf(Channel<Long>(1000), Channel<Long>(1000))
         val thing = AtomicInteger(0)
 
-        val job0 = launch(myContext) {
-            val registers = Day08.NeverNullMap<String, Long> {0}
+        val scope = CoroutineScope(myContext)
+
+        val job0 = scope.launch {
+            val registers = Day08.NeverNullMap<String, Long> { 0 }
             var instruction = 0
-            loop@ while (isActive) {
+            loop@while (true) {
                 val currInstruction = input[instruction]
                 when (currInstruction[0]) {
                     "snd" -> {
@@ -100,12 +104,12 @@ class Day18(override val adventOfCode: AdventOfCode) : Day {
             }
         }
         var sendCounter = 0
-        val job1 = launch(myContext) {
-            val registers = Day08.NeverNullMap<String, Long> {0}.apply {
+        val job1 = scope.launch(myContext) {
+            val registers = Day08.NeverNullMap<String, Long> { 0 }.apply {
                 set("p", 1)
             }
             var instruction = 0
-            loop@ while (isActive) {
+            loop@ while (true) {
                 val currInstruction = input[instruction]
                 when (currInstruction[0]) {
                     "snd" -> {

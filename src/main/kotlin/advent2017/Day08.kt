@@ -1,3 +1,5 @@
+package advent2017
+
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
 import xyz.usbpc.aoc.Day
 
@@ -29,7 +31,7 @@ class Day08(override val adventOfCode: AdventOfCode) : Day {
     }
 
     fun solve() {
-        val myMap = NeverNullMap<String, Int> {0}
+        val myMap = NeverNullMap<String, Int> { 0 }
         val compMap = hashMapOf<String, (Int, Int) -> Boolean>(
                 ">" to {x, y -> x > y},
                 "<" to {x, y -> x < y},

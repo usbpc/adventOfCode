@@ -1,3 +1,5 @@
+package advent2017
+
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
 import xyz.usbpc.utils.Direction
@@ -17,7 +19,7 @@ class Day22(override val adventOfCode: AdventOfCode) : Day {
         input.withIndex().forEach{(row, line) ->
             line.withIndex().forEach {(col, char) ->
                 if (char == '#') {
-                    infected.add(Point(row - input.size/2, col - input.size/2))
+                    infected.add(Point(row - input.size / 2, col - input.size / 2))
                 }
             }
         }
@@ -55,7 +57,7 @@ class Day22(override val adventOfCode: AdventOfCode) : Day {
         input.withIndex().forEach{(row, line) ->
             line.withIndex().forEach {(col, char) ->
                 if (char == '#') {
-                    infected.add(Point(row - input.size/2, col - input.size/2))
+                    infected.add(Point(row - input.size / 2, col - input.size / 2))
                 }
             }
         }
