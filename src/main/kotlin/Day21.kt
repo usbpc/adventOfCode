@@ -15,8 +15,8 @@ class Day21(override val adventOfCode: AdventOfCode) : Day {
         repeat(5) {
             grid = grid.enhance()
         }
-        ImageIO.write(grid.toImage(), "png", File("part1.png"))
-        println(grid.prettyString())
+        //ImageIO.write(grid.toImage(), "png", File("part1.png"))
+        //println(grid.prettyString())
         return grid.flatMap { it }.filter { it == '#' }.count().toString()
     }
 
@@ -25,7 +25,7 @@ class Day21(override val adventOfCode: AdventOfCode) : Day {
         repeat(18) {
             grid = grid.enhance()
         }
-        ImageIO.write(grid.toImage(), "png", File("part2.png"))
+        //ImageIO.write(grid.toImage(), "png", File("part2.png"))
         return grid.flatMap { it }.filter { it == '#' }.count().toString()
     }
     private fun List<List<Char>>.toImage(): BufferedImage {
