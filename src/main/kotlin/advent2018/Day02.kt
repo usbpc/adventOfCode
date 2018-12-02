@@ -9,14 +9,9 @@ class Day02(override val adventOfCode: AdventOfCode) : Day {
     val input = adventOfCode.getInput(2018, day).lines()
 
     override fun part1(): String {
-        val map = mutableMapOf<String, MutableMap<Char, Long>>()
-        for (line in input) {
-            map[line] = mutableMapOf()
-            val myMap = map[line]!!
-            line.forEach { letter -> myMap[letter] = (myMap[letter] ?: 0) + 1 }
-        }
-
-        return "" + map.filter { it.value.any { it.value == 2L } }.count() * map.filter { it.value.any { it.value == 3L} }.count()
+        val charCounts = input.map { line -> line.groupBy { it }.map { it.value.size } }
+        mapOf<Int, Int>().mapValues {  }
+        return "" + charCounts.count{ 2 in it } * charCounts.count { 3 in it }
     }
 
     override fun part2(): String {
@@ -29,7 +24,8 @@ class Day02(override val adventOfCode: AdventOfCode) : Day {
                 var diff = 0
                 for (count in 0 until current.length)
                     if (current[count] != cmp[count]) {
-                        diff++
+                        if (++diff > 1)
+                            break
                     } else {
                         out.append(current[count])
                     }
@@ -38,7 +34,6 @@ class Day02(override val adventOfCode: AdventOfCode) : Day {
 
             }
         }
-
         return out.toString()
     }
 }
