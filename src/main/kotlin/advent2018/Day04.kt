@@ -58,14 +58,14 @@ class Day04(override val adventOfCode: AdventOfCode) : Day {
             index++
         }
 
-        val mostAsleep = guardMap.toList().maxBy { (_, array ) -> -array.sum() }!!.first
+        val mostAsleep = guardMap.toList().maxBy { (_, array ) -> array.sum() }!!.first
 
         return "${mostAsleep * guardMap[mostAsleep].withIndex().maxBy { (_, value) -> value }!!.index }"
     }
 
     override fun part2(): String {
 
-        val consistentAsleep = guardMap.toList().maxBy { (_, array ) -> -array.max()!! }!!.first
+        val consistentAsleep = guardMap.toList().maxBy { (_, array ) -> array.max()!! }!!.first
 
         return "${ consistentAsleep * guardMap[consistentAsleep].withIndex().maxBy { (_, value) -> value }!!.index }"
 
