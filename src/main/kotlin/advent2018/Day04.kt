@@ -34,10 +34,11 @@ class Day04(override val adventOfCode: AdventOfCode) : Day {
                         LogEntryText.FallsAsleep
                     }
                 }
-
                 LogEntry(timestamp, value)
             }.sortedBy { it.timestamp }
+
     private val guardMap = Day08.NeverNullMap<Int, IntArray> { IntArray(60) }
+
     override fun part1(): String {
         var curGuard = 0
         var index = 0
@@ -58,17 +59,16 @@ class Day04(override val adventOfCode: AdventOfCode) : Day {
         }
 
         val mostAsleep = guardMap.toList().sortedBy { (_, array ) -> -array.sum() }.first().first
-        val mostAsleepTimetable = guardMap[mostAsleep]
 
-        return "${mostAsleep * mostAsleepTimetable.withIndex().fold(0) { max, cur -> if (cur.value > mostAsleepTimetable[max]) cur.index else max} }"
+        return "${mostAsleep * guardMap[mostAsleep].withIndex().maxBy { (_, value) -> value }!!.index }"
     }
 
     override fun part2(): String {
 
         val consistentAsleep = guardMap.toList().sortedBy { (_, array ) -> -array.max()!! }.first().first
-        val consistentAsleepTimetable = guardMap[consistentAsleep]
-        return "${ consistentAsleep * consistentAsleepTimetable.withIndex().fold(0) { max, cur -> if (cur.value > consistentAsleepTimetable[max]) cur.index else max} }"
-        
+
+        return "${ consistentAsleep * guardMap[consistentAsleep].withIndex().maxBy { (_, value) -> value }!!.index }"
+
     }
 
 
