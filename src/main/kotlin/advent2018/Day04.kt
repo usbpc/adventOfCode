@@ -64,12 +64,9 @@ class Day04(override val adventOfCode: AdventOfCode) : Day {
     }
 
     override fun part2(): String {
-
         val consistentAsleep = guardMap.toList().maxBy { (_, array ) -> array.max()!! }!!.first
 
         return "${ consistentAsleep * guardMap[consistentAsleep].withIndex().maxBy { (_, value) -> value }!!.index }"
-
     }
-
 
 }

@@ -2,37 +2,38 @@ package advent2018
 
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
+import kotlin.math.min
+import kotlin.streams.asStream
 
 class Day03(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 3
 
     data class Coords(val id: Int, val left: Int, val top: Int, val x: Int, val y: Int)
 
-    val regex = """#(\d+) @ (\d+),(\d+): (\d+)x(\d+)""".toRegex()
-
     val input = adventOfCode.getInput(2018, day).lines().map { line ->
 
-        val result = regex.find(line)
+        val numbers = line.extractInts()
 
-        if (result != null && result.groups.size == 6) {
-            Coords(result.groups[1]!!.value.toInt(), result.groups[2]!!.value.toInt(), result.groups[3]!!.value.toInt(), result.groups[4]!!.value.toInt(),  result.groups[5]!!.value.toInt())
+        if (numbers.size == 5) {
+            Coords(numbers[0], numbers[1], numbers[2], numbers[3],  numbers[4])
         } else {
             null
         }
     }
 
-    val grid = List(1000) {MutableList(1000) {0} }
+    val grid = List(1000) { ByteArray(1000) }
 
     override fun part1(): String {
         input.filterNotNull().forEach { coord ->
             for (i in coord.left until coord.left+coord.x) {
                 for (j in coord.top until coord.top+coord.y) {
-                    grid[i][j] = grid[i][j] + 1
+                    grid[i][j] = min((grid[i][j] + 1), 2).toByte()
                 }
             }
         }
 
-        return "" + grid.flatMap { it }.count { it >= 2 }
+        //return "" + grid.flatMap { it }.count { it >= 2 }
+        return "${grid.stream().flatMap { it.asSequence().asStream() }.filter {it >= 2}.count()}"
     }
 
     override fun part2(): String {
