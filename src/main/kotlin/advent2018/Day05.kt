@@ -1,58 +1,57 @@
 package advent2018
 
-import xyz.usbpc.aoc.Day
+import xyz.usbpc  .aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
+import java.lang.StringBuilder
+import java.util.*
 
 class Day05(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 5
     private val input = adventOfCode.getInput(2018, day)
 
-    override fun part1(): String {
-        val regexList = mutableListOf<Regex>()
-
-        var string = input
-
-        for (c in 'a'..'z') {
-            regexList.add(Regex("$c${c.toUpperCase()}"))
-            regexList.add(Regex("${c.toUpperCase()}$c"))
+    private infix fun Char.reactsWith(that: Char) : Boolean {
+        return if (this.isLowerCase()) {
+            this.toUpperCase() == that
+        } else {
+            this.toLowerCase() == that
         }
+    }
 
-       var prev = ""
+    private fun <E> Stack<E>.properPeek() : E? {
+        return if (this.empty()) {
+            null
+        } else {
+            this.peek()
+        }
+    }
 
-        while (prev != string) {
-            prev = string
-            for (r in regexList) {
-                string = r.replaceFirst(string, "")
+    private fun String.reduce() : String {
+        val stack = StringBuilder()
+
+        for (c in this) {
+            if (stack.lastOrNull()?.reactsWith(c) == true) {
+                stack.deleteCharAt(stack.lastIndex)
+            } else {
+                stack.append(c)
             }
         }
 
-        return "" + string.length
+        return stack.toString()
+    }
+
+    override fun part1(): String {
+        return "" + input.reduce().length
     }
 
     override fun part2(): String {
-        val regexList = mutableListOf<Regex>()
-
+        val results = mutableListOf<String>()
 
         for (c in 'a'..'z') {
-            regexList.add(Regex("$c${c.toUpperCase()}"))
-            regexList.add(Regex("${c.toUpperCase()}$c"))
+            var string = input.replace("$c", "").replace("${c.toUpperCase()}", "").reduce()
+
+            results.add(string)
         }
 
-        val resluts = mutableListOf<String>()
-        for (c in 'a'..'z') {
-            var string = input.replace("$c", "").replace("${c.toUpperCase()}", "")
-            var prev = ""
-
-            while (prev != string) {
-                prev = string
-                for (r in regexList) {
-                    string = r.replaceFirst(string, "")
-                }
-            }
-
-            resluts.add(string)
-        }
-
-        return "" + resluts.minBy { it.length }!!.length
+        return "" + results.minBy { it.length }!!.length
     }
 }
