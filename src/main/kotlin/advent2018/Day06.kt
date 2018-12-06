@@ -31,10 +31,10 @@ class Day06(override val adventOfCode: AdventOfCode) : Day {
 
 
     override fun part1(): String {
-        val highestX = input.sortedBy { -it.x }.first().x
-        val lowestX = input.sortedBy { it.x }.first().x
-        val highestY = input.sortedBy { -it.y }.first().y
-        val lowestY = input.sortedBy { it.y }.first().y
+        val highestX = input.maxBy { it.x }!!.x
+        val lowestX = input.minBy { it.x }!!.x
+        val highestY = input.maxBy { it.y }!!.y
+        val lowestY = input.minBy { it.y }!!.y
 
         val res = mutableMapOf<Point, Int>()
 
@@ -90,10 +90,10 @@ class Day06(override val adventOfCode: AdventOfCode) : Day {
     }
 
     override fun part2(): String {
-        val highestX = input.sortedBy { -it.x }.first().x
-        val lowestX = input.sortedBy { it.x }.first().x
-        val highestY = input.sortedBy { -it.y }.first().y
-        val lowestY = input.sortedBy { it.y }.first().y
+        val highestX = input.maxBy { it.x }!!.x
+        val lowestX = input.minBy { it.x }!!.x
+        val highestY = input.maxBy { it.y }!!.y
+        val lowestY = input.minBy { it.y }!!.y
 
         var area = 0L
 
