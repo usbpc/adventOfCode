@@ -36,9 +36,21 @@ class Day06(override val adventOfCode: AdventOfCode) : Day {
         val highestY = input.maxBy { it.y }!!.y
         val lowestY = input.minBy { it.y }!!.y
 
+
+        val filteredInput = mutableListOf<Point>().let { boundryList ->
+            for (x in lowestX..highestX) {
+                boundryList.add(Point(x, highestY))
+                boundryList.add(Point(x, lowestY))
+            }
+            for (y in (lowestY + 1)..(highestY - 1)) {
+                boundryList.add(Point(highestX, y))
+                boundryList.add(Point(lowestX, y))
+            }
+            input.filterNot { point -> boundryList.any { it.nearestPoint(input) == point } }
+        }
         val res = mutableMapOf<Point, Int>()
 
-        loop@for (point in input) {
+        for (point in filteredInput) {
             var area = 0
             var yw = point
             while (yw.nearestPoint(input) == point) {
@@ -47,19 +59,13 @@ class Day06(override val adventOfCode: AdventOfCode) : Day {
                 while (xw.nearestPoint(input) == point) {
                     area++
                     xw = xw.right()
-                    if (xw.x >= highestX)
-                        continue@loop
                 }
                 xw = yw.left()
                 while (xw.nearestPoint(input) == point) {
                     area++
                     xw = xw.left()
-                    if (xw.x <= lowestX)
-                        continue@loop
                 }
                 yw = yw.up()
-                if (yw.y >= highestY)
-                    continue@loop
             }
             yw = point.down()
             while (yw.nearestPoint(input) == point) {
@@ -68,21 +74,14 @@ class Day06(override val adventOfCode: AdventOfCode) : Day {
                 while (xw.nearestPoint(input) == point) {
                     area++
                     xw = xw.right()
-                    if (xw.x >= highestX)
-                        continue@loop
                 }
                 xw = yw.left()
                 while (xw.nearestPoint(input) == point) {
                     area++
                     xw = xw.left()
-                    if (xw.x <= lowestX)
-                        continue@loop
                 }
                 yw = yw.down()
-                if (yw.y <= lowestY)
-                    continue@loop
             }
-
             res[point] = area
         }
 
