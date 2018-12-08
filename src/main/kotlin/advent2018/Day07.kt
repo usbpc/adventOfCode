@@ -79,7 +79,9 @@ class Day07(override val adventOfCode: AdventOfCode) : Day {
         map.values.filter { thing -> map.values.none { it.children.any { it == thing.letter } } }.forEach { next.add(it.letter) }
         val used = mutableSetOf<Char>()
         var out = -1L
+
         val cooldowns = List(5) { Worker() }
+
         while(!used.containsAll(map.keys)) {
             cooldowns.filter { it.cooldown == 0 && it.letter != ' ' }.forEach {
                 used.add(it.letter)
@@ -93,7 +95,9 @@ class Day07(override val adventOfCode: AdventOfCode) : Day {
 
                 it.letter = ' '
             }
+
             val cur = next.sorted().take(cooldowns.filter { it.cooldown == 0 }.count())
+
             cur.forEach { next.remove(it) }
             for (i in 0 until cooldowns.size) {
                 cooldowns[i].cooldown = max(cooldowns[i].cooldown-1, 0)
