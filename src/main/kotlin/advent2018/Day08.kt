@@ -8,15 +8,7 @@ class Day08(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 8
     private val input = adventOfCode.getInput(2018, day).extractLongs()
 
-    class Node(val children: MutableList<Node> = mutableListOf(), val metadata: MutableList<Long> = mutableListOf()) {
-        val id = curId++
-        companion object {
-            var curId = 0
-        }
-
-    }
-
-
+    class Node(val children: MutableList<Node> = mutableListOf(), val metadata: MutableList<Long> = mutableListOf())
 
     fun parseInput(input: LongArray) = parseChildren(input, 0).first
 
@@ -68,10 +60,13 @@ class Day08(override val adventOfCode: AdventOfCode) : Day {
 
         while (stack.isNotEmpty()) {
             val cur = stack.pop()
-            out += if (cur.children.isEmpty()) cur.metadata.sum() else 0
-            for (m in cur.metadata) {
-                if (m-1 < cur.children.size)
-                    stack.push(cur.children[(m-1).toInt()])
+            if (cur.children.isEmpty()) {
+                out += cur.metadata.sum()
+            } else {
+                cur.metadata
+                        .map { m -> (m-1).toInt() }
+                        .filter { index -> index < cur.children.size }
+                        .forEach { index -> stack.push(cur.children[index]) }
             }
         }
 
