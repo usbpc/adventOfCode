@@ -8,7 +8,7 @@ class Day08(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 8
     private val input = adventOfCode.getInput(2018, day).extractInts()
 
-    class Node(val children: MutableList<Node> = mutableListOf(), val metadata: MutableList<Int> = mutableListOf(), val childNum : Int = 0, val metadataNum : Int = 0)
+    data class Node(val children: MutableList<Node> = mutableListOf(), val metadata: MutableList<Int> = mutableListOf()/*, val childNum : Int = 0, val metadataNum : Int = 0*/)
 
     fun parseInput(input: IntArray) = parseChildrenRecursive(input, 0).first
 
@@ -33,7 +33,7 @@ class Day08(override val adventOfCode: AdventOfCode) : Day {
         return node to pos
     }
 
-    fun parse(input: IntArray) : Node {
+    /*fun parse(input: IntArray) : Node {
         var pos = 0
         val stack = Stack<Node>()
         var node : Node? = null
@@ -57,10 +57,10 @@ class Day08(override val adventOfCode: AdventOfCode) : Day {
         } while (stack.isNotEmpty())
 
         return node!!
-    }
+    }*/
 
     override fun part1(): String {
-        val tree = parse(input)
+        val tree = parseInput(input)
 
         val stack = Stack<Node>()
         stack.push(tree)
@@ -91,7 +91,7 @@ class Day08(override val adventOfCode: AdventOfCode) : Day {
             } else {
                 cur.metadata
                         .map { m -> m-1 }
-                        .filter { index -> index < cur.children.size }
+                        .filter { index -> 0 <= index && index < cur.children.size }
                         .forEach { index -> stack.push(cur.children[index]) }
             }
         }
