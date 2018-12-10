@@ -10,41 +10,6 @@ class Day09(override val adventOfCode: AdventOfCode) : Day {
 
     private fun Int.isWorthPoints() = (this % 23) == 0
 
-    private fun MutableList<Int>.insertMarble(curM: Int, nextNum: Int) : Int {
-        val highIndex = (curM + 2) % this.size
-        return if (highIndex == 0) {
-            this.add(nextNum)
-            this.size-1
-        } else {
-            this.add(highIndex, nextNum)
-            highIndex
-        }
-    }
-
-    private fun MutableList<Int>.removeMarble(curM: Int) : Pair<Int, Int> {
-        val index = (curM-7+this.size) % this.size
-        return index to this.removeAt(index)
-    }
-
-    private fun MutableList<Int>.printLikeAoc(elf: Int, curM: Int) : String {
-        val out = StringBuilder()
-        out.append('[')
-        out.append(elf)
-        out.append("]  ")
-        this.withIndex()
-                .forEach { (i, num) ->
-            if (i == curM) {
-                out.setCharAt(out.lastIndex, '(')
-                out.append(num)
-                out.append(')')
-            } else {
-                out.append(num)
-            }
-                    out.append(' ')
-        }
-        return out.toString()
-    }
-
     class CirclePlayfield<E>(init: E) {
         var head: ListItem<E>
         init {
@@ -71,6 +36,8 @@ class Day09(override val adventOfCode: AdventOfCode) : Day {
             toRemove.prev.next = toRemove.next
             toRemove.next.prev = toRemove.prev
 
+            head = toRemove.next
+
             return toRemove.item
         }
 
@@ -82,22 +49,19 @@ class Day09(override val adventOfCode: AdventOfCode) : Day {
     }
 
     private fun calculateWinningScore(maxElf: Int, maxMarble: Int) : Long {
-        val playarea = mutableListOf(0)
+        val playarea = CirclePlayfield(0)
 
         val scores = LongArray(maxElf)
 
-        var curMarble = 0
         var nextMarbleNum = 1
 
         var currentElf = 0
 
         while (nextMarbleNum <= maxMarble) {
-            curMarble = if (nextMarbleNum.isWorthPoints()) {
-                val (cm, points) = playarea.removeMarble(curMarble)
-                scores[currentElf] += points.toLong() + nextMarbleNum++
-                cm
+            if (nextMarbleNum.isWorthPoints()) {
+                scores[currentElf] += playarea.removeMarble().toLong() + nextMarbleNum++
             } else {
-                playarea.insertMarble(curMarble, nextMarbleNum++)
+                playarea.insertMarble(nextMarbleNum++)
             }
             //println(playarea.printLikeAoc(currentElf+1, curMarble))
             currentElf = (currentElf+1) % maxElf
@@ -110,6 +74,6 @@ class Day09(override val adventOfCode: AdventOfCode) : Day {
     }
 
     override fun part2(): String {
-        return "" + calculateWinningScore(input[0], input[1])
+        return "" + calculateWinningScore(input[0], input[1]*100)
     }
 }
