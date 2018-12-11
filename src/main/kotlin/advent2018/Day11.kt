@@ -1,27 +1,26 @@
 package advent2018
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
+import kotlin.math.max
 
 class Day11(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 11
-    private val input = adventOfCode.getInput(2018, day).toLong()
+    private val input = adventOfCode.getInput(2018, day).toInt()
 
-    fun Long.hundretsDigit() = this.toString().dropLast(2).last().toString().toLong()
+    fun Int.hundretsDigit() = this.toString().dropLast(2).last().toString().toInt()
+
     override fun part1(): String {
-        val grid = Array<LongArray>(300){LongArray(300)}
+        val grid = Array<IntArray>(300) { IntArray(300) }
         for (x in 1..300) {
             for (y in 1..300) {
-                val rackId  = x + 10L
+                val rackId = x + 10
                 var powerLvl = rackId * y
                 powerLvl += input
                 powerLvl *= rackId
                 powerLvl = powerLvl.hundretsDigit() - 5
-                grid[x-1][y-1] = powerLvl
+                grid[x - 1][y - 1] = powerLvl
             }
         }
 
@@ -30,7 +29,7 @@ class Day11(override val adventOfCode: AdventOfCode) : Day {
         var maxY = -1
         for (x in 1..298) {
             for (y in 1..298) {
-                val powerLevel = grid.getSectionSum(x-1,y-1, 2)
+                val powerLevel = grid.getSectionSum(x - 1, y - 1, 2)
                 if (powerLevel > maxPower) {
                     maxPower = powerLevel
                     maxX = x
@@ -42,75 +41,66 @@ class Day11(override val adventOfCode: AdventOfCode) : Day {
         return "$maxX,$maxY"
     }
 
-    fun Array<LongArray>.getSectionSum(xstart : Int, ystart : Int, size : Int) : Long {
+    fun Array<IntArray>.getSectionSum(xstart: Int, ystart: Int, size: Int): Long {
         var out = 0L
-        for (x in xstart..xstart+size) {
-            for (y in ystart..ystart+size) {
+        for (x in xstart..xstart + size) {
+            for (y in ystart..ystart + size) {
                 out += this[x][y]
             }
         }
         return out
     }
 
-    override fun part2(): String = runBlocking {
-        val grid = Array(300){LongArray(300)}
+    override fun part2(): String {
+        val grid = Array(300) { IntArray(300) }
         for (x in 1..300) {
             for (y in 1..300) {
-                val rackId  = x + 10L
+                val rackId = x + 10
                 var powerLvl = rackId * y
                 powerLvl += input
                 powerLvl *= rackId
                 powerLvl = powerLvl.hundretsDigit() - 5
-                grid[x-1][y-1] = powerLvl
+                grid[x - 1][y - 1] = powerLvl
             }
         }
 
-        var curCellSize = 1
-        val prefixSums = MutableList(300) { x-> grid[x].toMutableList() }
 
         var maxPower = Long.MIN_VALUE
         var maxX = -1
         var maxY = -1
         var maxSize = -1
 
-        while (curCellSize <= 300) {
-            prefixSums.withIndex()
-                    .forEach { (x, yList) ->
-                        yList.withIndex()
-                                .forEach { (y, power) ->
-                                    if (power > maxPower) {
-                                        maxY = y
-                                        maxX = x
-                                        maxPower = power
-                                        maxSize = curCellSize
-                                    }
+        runBlocking(Dispatchers.Default) {
+            val deferredList = mutableListOf<Deferred<List<Int>>>()
+                for (x in 0..299) {
+                    for (y in 0..299) {
+                        async {
+                            var ms = -1
+                            var maxTotal = Int.MIN_VALUE
+                            var total = 0
+                            for (size in 0..299-max(x, y)) {
+                                for (yToAdd in y..y+size) {
+                                    total += grid[x+size][yToAdd]
                                 }
-                    }
-
-            curCellSize++
-
-            prefixSums.removeAt(prefixSums.lastIndex)
-            prefixSums.forEach { row -> row.removeAt(row.lastIndex) }
-
-            val jobs = mutableListOf<Job>()
-
-            prefixSums.withIndex()
-                    .forEach { (x, yList) ->
-                        val job = launch(Dispatchers.Default) {
-                            for (y in 0 until yList.size) {
-                                for (yToAdd in y until y+curCellSize) {
-                                    yList[y] += grid[x+curCellSize-1][yToAdd]
+                                for (xToAdd in x until x+size) {
+                                    total += grid[xToAdd][y+size]
                                 }
-                                for (xToAdd in x until x+curCellSize-1) {
-                                    yList[y] += grid[xToAdd][y+curCellSize-1]
+                                if (total > maxTotal) {
+                                    maxTotal = total
+                                    ms = size+1
                                 }
                             }
-                        }
-                        jobs.add(job)
+                            listOf(maxTotal, x+1, y+1, ms)
+                        }.let { deferredList.add(it) }
                     }
-            jobs.forEach { it.join() }
+                }
+            deferredList.map { it.await() }.maxBy { it[0] }!!
+        }.let {
+            maxX = it[1]
+            maxY = it[2]
+            maxSize = it[3]
         }
 
-        return@runBlocking "${maxX+1},${maxY+1},$maxSize"
+        return "$maxX,$maxY,$maxSize"
     }
 }
