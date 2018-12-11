@@ -9,17 +9,17 @@ class Day11(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 11
     private val input = adventOfCode.getInput(2018, day).toInt()
 
-    fun Int.hundretsDigit() = this.toString().dropLast(2).last().toString().toInt()
+    private fun Int.hundredsDigit() = (this % 1000) / 100
 
     override fun part1(): String {
-        val grid = Array<IntArray>(300) { IntArray(300) }
+        val grid = Array(300) { IntArray(300) }
         for (x in 1..300) {
             for (y in 1..300) {
                 val rackId = x + 10
                 var powerLvl = rackId * y
                 powerLvl += input
                 powerLvl *= rackId
-                powerLvl = powerLvl.hundretsDigit() - 5
+                powerLvl = powerLvl.hundredsDigit() - 5
                 grid[x - 1][y - 1] = powerLvl
             }
         }
@@ -41,7 +41,7 @@ class Day11(override val adventOfCode: AdventOfCode) : Day {
         return "$maxX,$maxY"
     }
 
-    fun Array<IntArray>.getSectionSum(xstart: Int, ystart: Int, size: Int): Long {
+    private fun Array<IntArray>.getSectionSum(xstart: Int, ystart: Int, size: Int): Long {
         var out = 0L
         for (x in xstart..xstart + size) {
             for (y in ystart..ystart + size) {
@@ -59,16 +59,14 @@ class Day11(override val adventOfCode: AdventOfCode) : Day {
                 var powerLvl = rackId * y
                 powerLvl += input
                 powerLvl *= rackId
-                powerLvl = powerLvl.hundretsDigit() - 5
+                powerLvl = powerLvl.hundredsDigit() - 5
                 grid[x - 1][y - 1] = powerLvl
             }
         }
 
-
-        var maxPower = Long.MIN_VALUE
-        var maxX = -1
-        var maxY = -1
-        var maxSize = -1
+        var maxX = 0
+        var maxY = 0
+        var maxSize = 0
 
         runBlocking(Dispatchers.Default) {
             val deferredList = mutableListOf<Deferred<List<Int>>>()
@@ -91,14 +89,14 @@ class Day11(override val adventOfCode: AdventOfCode) : Day {
                                 }
                             }
                             listOf(maxTotal, x+1, y+1, ms)
-                        }.let { deferredList.add(it) }
+                        }.let { localMax -> deferredList.add(localMax) }
                     }
                 }
-            deferredList.map { it.await() }.maxBy { it[0] }!!
-        }.let {
-            maxX = it[1]
-            maxY = it[2]
-            maxSize = it[3]
+            deferredList.map { it.await() }.maxBy { it[0] }!!.let { bestArea ->
+                maxX = bestArea[1]
+                maxY = bestArea[2]
+                maxSize = bestArea[3]
+            }
         }
 
         return "$maxX,$maxY,$maxSize"
