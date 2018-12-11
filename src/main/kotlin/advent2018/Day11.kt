@@ -60,6 +60,7 @@ class Day11(override val adventOfCode: AdventOfCode) : Day {
                 powerLvl += input
                 powerLvl *= rackId
                 powerLvl = powerLvl.hundredsDigit() - 5
+                ((((x+10) * y + input) * (x+10)) % 1000) / 100
                 grid[x - 1][y - 1] = powerLvl
             }
         }

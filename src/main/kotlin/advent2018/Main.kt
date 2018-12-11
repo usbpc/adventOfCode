@@ -16,7 +16,7 @@ fun main(args: Array<String>) {
         //add(Day07(adventOfCode))
         //add(Day08(adventOfCode))
         //add(Day09(adventOfCode))
-        //add(Day10(adventOfCode))
+        add(Day10(adventOfCode))
         add(Day11(adventOfCode))
         //add(Day12(adventOfCode))
         //add(Day13(adventOfCode))
