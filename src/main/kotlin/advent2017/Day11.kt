@@ -6,7 +6,7 @@ import kotlin.math.abs
 import kotlin.math.max
 
 class Day11(override val adventOfCode: AdventOfCode) : Day {
-    private enum class Direction(val shortName: String) {
+    enum class Direction(val shortName: String) {
         NORTH("n"),
         NORTH_EAST("ne"),
         SOUTH_EAST("se"),
@@ -19,7 +19,7 @@ class Day11(override val adventOfCode: AdventOfCode) : Day {
         }
     }
 
-    private class HexWalker(private var x: Int, private var y: Int) {
+    class HexWalker(private var x: Int, private var y: Int) {
         data class Position(val x: Int, val y: Int)
 
         val currentPosition: Position

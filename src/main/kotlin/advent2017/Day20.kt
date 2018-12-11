@@ -49,7 +49,7 @@ class Day20(override val adventOfCode: AdventOfCode) : Day {
         var cur = input
         repeat(100) {
             cur = cur.withOutCollisions()
-            cur.forEach {it.tick()}
+            cur.forEach(Particle::tick)
             //println(cur.size)
         }
         return cur.size.toString()

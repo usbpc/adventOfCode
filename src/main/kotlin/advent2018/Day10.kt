@@ -11,14 +11,11 @@ class Day10(override val adventOfCode: AdventOfCode) : Day {
             .map { line -> line.extractLongs() }
             .map { numbers -> Position(numbers[1], numbers[0]) to Velocity(numbers[3], numbers[2]) }
     data class Position(var x : Long, var y : Long) {
-        var changes = 0
         fun add(v : Velocity) {
-            changes++
             this.x += v.x
             this.y += v.y
         }
         fun sub(v : Velocity) {
-            changes--
             this.x -= v.x
             this.y -= v.y
         }
@@ -114,5 +111,4 @@ class Day10(override val adventOfCode: AdventOfCode) : Day {
         }
         return "$counter"
     }
-
 }
