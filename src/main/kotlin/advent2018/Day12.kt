@@ -23,7 +23,10 @@ class Day12(override val adventOfCode: AdventOfCode) : Day {
             currentState[i] = startState[i-zeroIndex]
         }
 
-        repeat(200) {
+        var previous = listOf<Boolean>()
+        var iterations = 0
+        while (true) {
+            iterations++
             val newState = BooleanArray(playfieldSize)
             for (i in 2 until newState.size - 2) {
                 for (transition in transitions) {
@@ -34,7 +37,25 @@ class Day12(override val adventOfCode: AdventOfCode) : Day {
                 }
             }
             currentState = newState
-            currentState.forEach { print(if (it) '#' else '.') }
+
+            var leftMostTrue = 0
+            for (i in 0..currentState.lastIndex) {
+                if (currentState[i]) {
+                    leftMostTrue = i
+                    break
+                }
+            }
+
+            val trunkated = currentState.dropWhile { !it }.dropLastWhile { !it }
+            if (previous == trunkated) {
+                println("Repitition found!")
+                return
+            }
+            previous = trunkated
+
+            print("iter $iterations (${leftMostTrue-zeroIndex+1})")
+
+            print(trunkated.withIndex().filter { (_, value) -> value }.sumBy { (i, _) -> i+leftMostTrue-zeroIndex })
             print('\n')
         }
 
