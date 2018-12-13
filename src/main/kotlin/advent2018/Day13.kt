@@ -30,7 +30,15 @@ class Day13(override val adventOfCode: AdventOfCode) : Day {
 
     }
 
-    private data class Cart(var x: Int, var y: Int, var facing: Direction, val tracks : List<List<Char>>) {
+    private data class Cart(var x: Int, var y: Int, var facing: Direction, val tracks : List<List<Char>>) : Comparable<Cart> {
+
+        override fun compareTo(other: Cart): Int =
+                if (this.y == other.y) {
+                    this.x - other.x
+                } else {
+                    this.y - other.y
+                }
+
         var turnCounter = 0
         fun char() =
                 when(facing) {
@@ -47,8 +55,6 @@ class Day13(override val adventOfCode: AdventOfCode) : Day {
                 Direction.RIGHT -> x++
             }
             when (tracks[y][x]) {
-                '|' -> {}
-                '-' -> {}
                 '+' -> {
                     when (turnCounter) {
                         0 -> facing = facing.left()
@@ -127,48 +133,32 @@ class Day13(override val adventOfCode: AdventOfCode) : Day {
     }
 
     override fun part1(): String {
-        val cmp = Comparator<Cart> { o1, o2 ->
-            if (o1.y == o2.y) {
-                o1.x - o2.x
-            } else {
-                o1.y - o2.y
-            }
-        }
-        val carts = parseInput().toMutableList()
+        var carts = parseInput()
         while (true) {
             for (cart in carts) {
                 cart.stepOnce()
-                if (carts.filter { it !== cart }.any { otherCart -> cart.y == otherCart.y && cart.x == otherCart.x }) {
+                if (carts.filter { it !== cart }.any { otherCart -> cart.y == otherCart.y && cart.x == otherCart.x })
                     return "${cart.x},${cart.y}"
-                }
             }
-            carts.sortWith(cmp)
-            /*carts.forEach { println(it) }
-            printRailNetwork(carts)
-            print("\n\n")*/
+            carts = carts.sorted()
         }
     }
 
+    private fun <E> MutableList<E>.pop() = this.removeAt(0)
+
     override fun part2(): String {
-        val cmp = Comparator<Cart> { o1, o2 ->
-            if (o1.y == o2.y) {
-                o1.x - o2.x
-            } else {
-                o1.y - o2.y
-            }
-        }
-        var carts = parseInput().toMutableList()
+        var carts = parseInput()
+
         while (carts.size > 1) {
-            for (cart in carts) {
-                cart.stepOnce()
-                if (carts.filter { it !== cart }.any { otherCart -> cart.y == otherCart.y && cart.x == otherCart.x }) {
-                    carts = carts.filterNot { otherCart -> cart.y == otherCart.y && cart.x == otherCart.x }.toMutableList()
+            val cartsToMove = carts.sorted().toMutableList()
+            while (cartsToMove.isNotEmpty()) {
+                val movedCart = cartsToMove.pop()
+                movedCart.stepOnce()
+                if (carts.filter { it !== movedCart }.any { cart -> movedCart.y == cart.y && movedCart.x == cart.x }) {
+                    carts = carts.filterNot { cart -> cart.y == movedCart.y && cart.x == movedCart.x }
+                    cartsToMove.removeIf { cart -> cart.y == movedCart.y && cart.x == movedCart.x }
                 }
             }
-            carts.sortWith(cmp)
-            /*carts.forEach { println(it) }
-            printRailNetwork(carts)
-            print("\n\n")*/
         }
 
         val cart = carts.single()
