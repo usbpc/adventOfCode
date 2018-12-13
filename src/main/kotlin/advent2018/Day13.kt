@@ -83,6 +83,7 @@ class Day13(override val adventOfCode: AdventOfCode) : Day {
     }
 
     private val input = adventOfCode.getInput(2018, day).lines()
+
     private fun parseInput() : List<Cart> {
         val tracks = input
                 .map { line ->
@@ -96,6 +97,7 @@ class Day13(override val adventOfCode: AdventOfCode) : Day {
                         }
                     }
                 }
+
         return input.withIndex().map { (y, line) ->
             val value = line.withIndex()
                     .filter { (_, char) ->
