@@ -46,23 +46,22 @@ class Day12(override val adventOfCode: AdventOfCode) : Day {
                 }
             }
 
-            val trunkated = currentState.dropWhile { !it }.dropLastWhile { !it }
-            if (previous == trunkated) {
-                println("Repitition found!")
-                return
+            val truncated = currentState.dropWhile { !it }.dropLastWhile { !it }
+            if (previous == truncated) {
+                println("Repetition found!")
+                return ""
             }
-            previous = trunkated
+            previous = truncated
 
             print("iter $iterations (${leftMostTrue-zeroIndex+1})")
-
-            print(trunkated.withIndex().filter { (_, value) -> value }.sumBy { (i, _) -> i+leftMostTrue-zeroIndex })
+            print(truncated.withIndex().filter { (_, value) -> value }.sumBy { (i, _) -> i+leftMostTrue-zeroIndex })
             print('\n')
         }
 
         return "" + currentState.withIndex().filter { (_, value) -> value }.sumBy { (i, _) -> i-zeroIndex }
     }
 
-    fun BooleanArray.matchesRegion(startIndex : Int, compare: BooleanArray) : Boolean{
+    private fun BooleanArray.matchesRegion(startIndex : Int, compare: BooleanArray) : Boolean{
         var out = true
         var index = 0
         for (i in startIndex-2 until startIndex+compare.size-2) {
