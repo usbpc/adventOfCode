@@ -70,41 +70,100 @@ class Day14(override val adventOfCode: AdventOfCode) : Day {
         return channel
     }
 
-    override fun part1(): String = runBlocking(Dispatchers.Default) {
-        val numbers = generateSequence()
+    override fun part1(): String {
+        val numbers = generateSequence().iterator()
+
         repeat(input.toInt()) {
-            numbers.receive()
+            numbers.next()
         }
 
         val out = StringBuilder()
 
-        repeat (10) {
-            out.append(numbers.receive())
+        repeat(10) {
+            out.append(numbers.next())
         }
 
-        numbers.cancel()
-        return@runBlocking out.toString()
+        return out.toString()
     }
 
-    override fun part2(): String = runBlocking(Dispatchers.Default) {
-        val numbers = generateSequence()
+    private class FixedSizeLikedList<E>(val size: Int) {
+        var head : Entry<E>
+        var tail : Entry<E>
+        init {
+            head = Entry()
+            var cur = head
+            repeat(size-1) {
+                val new = Entry(prev = cur)
+                cur.next = new
+                cur = new
+            }
+            tail = cur
+        }
+
+        fun add(e: E) {
+            val tmp = head
+            head = head.next!!
+            head.prev = null
+
+            tmp.next = null
+            tmp.prev = tail
+
+            tmp.value = e
+
+            tail.next = tmp
+
+            tail = tmp
+        }
+
+        override fun equals(other: Any?): Boolean {
+            if (other !is List<*>)
+                return false
+            if (other.size != this.size)
+                return false
+            var cur = head
+
+            for (i in 0..other.lastIndex) {
+                if (other[i] != cur.value)
+                    return false
+                cur = cur.next ?: break
+            }
+
+            return true
+        }
+
+        override fun toString(): String {
+            val out = StringBuilder()
+            out.append('[')
+            var cur = head
+            while (cur.next != null) {
+                out.append(cur.value)
+                out.append(',')
+                cur = cur.next!!
+            }
+            out.append(cur.value)
+            out.append(']')
+            return out.toString()
+        }
+
+        class Entry<E>(var next: Entry<E>? = null, var prev: Entry<E>? = null, var value : E? = null)
+    }
+
+    override fun part2(): String {
+        val numbers = generateSequence().iterator()
         val toFind = input.map { c -> c - '0' }
         var counter = 0
 
-        val compare = LinkedList<Int>()
+        val compare = FixedSizeLikedList<Int>(toFind.size)
         repeat(toFind.size) {
-            compare.add(numbers.receive())
+            compare.add(numbers.next())
             counter++
         }
 
-        while (!toFind.equals(compare)) {
-            compare.pop()
-            compare.add(numbers.receive())
+        while (compare != toFind) {
+            compare.add(numbers.next())
             counter++
         }
 
-        numbers.cancel()
-
-        return@runBlocking "$counter"
+        return "${counter - compare.size}"
     }
 }
