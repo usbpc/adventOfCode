@@ -13,27 +13,30 @@ class Day14(override val adventOfCode: AdventOfCode) : Day {
     private val input = adventOfCode.getInput(2018, day)
 
     private fun generateSequence() = sequence {
+        var index = 0
+        val numbers = IntArray(20188250+10)
+        numbers[index++] = 3
+        numbers[index++] = 7
         var firstElf = 0
         var secondElf = 1
-        val scores = mutableListOf(3, 7)
         yield(3)
         yield(7)
         while (true) {
-            val sum = scores[firstElf] + scores[secondElf]
+            val sum = numbers[firstElf] + numbers[secondElf]
             if (sum >= 10) {
                 val firstDigit = sum / 10
                 val secondDigit = sum % 10
-                scores.add(firstDigit)
+                numbers[index++] = firstDigit
                 yield(firstDigit)
-                scores.add(secondDigit)
+                numbers[index++] = secondDigit
                 yield(secondDigit)
             } else {
-                scores.add(sum)
+                numbers[index++] = sum
                 yield(sum)
             }
 
-            firstElf = (firstElf + scores[firstElf] + 1) % scores.size
-            secondElf = (secondElf +scores[secondElf] + 1) % scores.size
+            firstElf = (firstElf + numbers[firstElf] + 1) % index
+            secondElf = (secondElf +numbers[secondElf] + 1) % index
         }
     }
 
@@ -148,6 +151,30 @@ class Day14(override val adventOfCode: AdventOfCode) : Day {
         class Entry<E>(var next: Entry<E>? = null, var prev: Entry<E>? = null, var value : E? = null)
     }
 
+    private class NoBoundsIntRingBuffer(size: Int) {
+        val backingArray = IntArray(size)
+        var front = 0
+
+        fun add(num: Int) {
+            backingArray[front] = num
+            front = (front + 1) % backingArray.size
+        }
+
+        override fun equals(other: Any?): Boolean {
+            if (other !is List<*>)
+                return false
+            if (other.size != backingArray.size)
+                return false
+            for (i in 0..other.lastIndex) {
+                if (other[i] != backingArray[(i+front) % backingArray.size])
+                    return false
+            }
+            return true
+        }
+
+        override fun toString(): String = Arrays.toString(backingArray)
+    }
+
     override fun part2(): String {
         val numbers = generateSequence().iterator()
         val toFind = input.map { c -> c - '0' }
@@ -159,11 +186,11 @@ class Day14(override val adventOfCode: AdventOfCode) : Day {
             counter++
         }
 
-        while (compare != toFind) {
+        while (!compare.equals(toFind)) {
             compare.add(numbers.next())
             counter++
         }
 
-        return "${counter - compare.size}"
+        return "${counter - toFind.size}"
     }
 }
