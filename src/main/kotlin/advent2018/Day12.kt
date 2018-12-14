@@ -39,7 +39,7 @@ class Day12(override val adventOfCode: AdventOfCode) : Day {
         return "" + currentState.withIndex().filter { (_, value) -> value }.sumBy { (i, _) -> i-zeroIndex }
     }
 
-    private fun BooleanArray.matchesRegion(startIndex : Int, compare: BooleanArray) : Boolean{
+    private fun BooleanArray.matchesRegion(startIndex : Int, compare: BooleanArray) : Boolean {
         var out = true
         var index = 0
         for (i in startIndex-2 until startIndex+compare.size-2) {
