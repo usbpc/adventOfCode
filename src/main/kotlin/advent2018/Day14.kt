@@ -9,50 +9,50 @@ class Day14(override val adventOfCode: AdventOfCode) : Day {
     private val input = adventOfCode.getInput(2018, day)
 
     override fun part1(): String {
-        val input = input.toInt()
+        val recipeNum = input.toInt()
         var firstElfCur = 0
         var secondElfCur = 1
-        val recepieScores = mutableListOf(3, 7)
+        val recipeScores = mutableListOf(3, 7)
 
-        while (recepieScores.size < input + 10) {
-            val sum = recepieScores[firstElfCur] + recepieScores[secondElfCur]
+        while (recipeScores.size < recipeNum + 10) {
+            val sum = recipeScores[firstElfCur] + recipeScores[secondElfCur]
             if (sum >= 10) {
                 val firstDigit = sum / 10
                 val secondDigit = sum % 10
-                recepieScores.add(firstDigit)
-                recepieScores.add(secondDigit)
+                recipeScores.add(firstDigit)
+                recipeScores.add(secondDigit)
             } else {
-                recepieScores.add(sum)
+                recipeScores.add(sum)
             }
 
-            firstElfCur = (firstElfCur + recepieScores[firstElfCur] + 1) % recepieScores.size
-            secondElfCur = (secondElfCur +recepieScores[secondElfCur] + 1) % recepieScores.size
+            firstElfCur = (firstElfCur + recipeScores[firstElfCur] + 1) % recipeScores.size
+            secondElfCur = (secondElfCur +recipeScores[secondElfCur] + 1) % recipeScores.size
         }
 
         val out = StringBuilder()
 
-        for (i in input until input+10) {
-            out.append(recepieScores[i])
+        for (i in recipeNum until recipeNum+10) {
+            out.append(recipeScores[i])
         }
 
         return out.toString()
     }
 
     override fun part2(): String {
-        val inputList = input.toCharArray().map { it.toString().toByte() }
+        val inputList = input.map { c -> c - '0'}
         var firstElfCur = 0
         var secondElfCur = 1
-        val recipeScores = mutableListOf(3.toByte(), 7.toByte())
+        val recipeScores = mutableListOf(3, 7)
 
         while (true) {
             val sum = recipeScores[firstElfCur] + recipeScores[secondElfCur]
             if (sum >= 10) {
                 val firstDigit = sum / 10
                 val secondDigit = sum % 10
-                recipeScores.add(firstDigit.toByte())
-                recipeScores.add(secondDigit.toByte())
+                recipeScores.add(firstDigit)
+                recipeScores.add(secondDigit)
             } else {
-                recipeScores.add(sum.toByte())
+                recipeScores.add(sum)
             }
 
             if (recipeScores.size >= inputList.size) {
