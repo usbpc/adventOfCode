@@ -27,7 +27,6 @@ class Day13(override val adventOfCode: AdventOfCode) : Day {
                     LEFT -> UP
                     RIGHT -> DOWN
                 }
-
     }
 
     private data class Cart(var x: Int, var y: Int, var facing: Direction, val tracks : List<List<Char>>) : Comparable<Cart> {
