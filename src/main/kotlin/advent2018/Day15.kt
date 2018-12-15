@@ -16,9 +16,9 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
         GOBLIN
     }
 
-    data class Fighter(val type: Type, var x: Int, var y: Int, var health : Int = 200) : Comparable<Fighter> {
-        fun getHit() {
-            health -= 3
+    data class Fighter(val type: Type, var x: Int, var y: Int, var health : Int = 200, val attackPower : Int = 3) : Comparable<Fighter> {
+        fun getHit(amount: Int) {
+            health -= amount
         }
 
         override fun compareTo(other: Fighter): Int =
@@ -34,13 +34,13 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
         fun positionAsPoint() = Point(x, y)
     }
 
-    private fun characterList() : List<Fighter> {
+    private fun characterList(elfAttack : Int = 3) : List<Fighter> {
         val out = mutableListOf<Fighter>()
 
         input.forEachIndexed { y, row ->
             row.forEachIndexed { x, c ->
                 when (c) {
-                    'E' -> out.add(Fighter(Type.ELF, x, y))
+                    'E' -> out.add(Fighter(Type.ELF, x, y, attackPower = elfAttack))
                     'G' -> out.add(Fighter(Type.GOBLIN, x, y))
                 }
             }
@@ -219,7 +219,7 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
                 }
 
                 toAttack?.let {toAttack ->
-                    toAttack.getHit()
+                    toAttack.getHit(character.attackPower)
                     if (toAttack.health < 0) {
                         dead.add(toAttack)
                     }
@@ -236,8 +236,111 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
     }
 
     override fun part2(): String {
+        var attack = 4
+        outer@while (true) {
+            var characters = characterList(attack++).sorted()
+            val arena = inputSpaceArray()
 
+            var counter = 0
 
-        return ""
+            loop@while (characters.any { p -> p.type == Type.GOBLIN } && characters.any { p -> p.type == Type.ELF }) {
+                //println("Round: $counter")
+                //arena.printPlayfield(characters)
+                val dead = mutableSetOf<Fighter>()
+                for (character in characters) {
+                    if (characters.filter { p -> p !in dead }.none { p -> p.type == Type.GOBLIN } || characters.filter { p -> p !in dead }.none { p -> p.type == Type.ELF }) {
+                        characters = characters.filter { c -> c !in dead }.sorted()
+                        break@loop
+                    }
+                    if (character in dead)
+                        continue
+
+                    val allReachable = floodFill(character.positionAsPoint(), arena, characters.filter { p -> p !in dead })
+
+                    if (false) {
+                        allReachable.forEach { thing ->
+                            thing.forEach { num ->
+                                if (num != Int.MIN_VALUE) {
+                                    print(num.toString().padStart(3, ' '))
+                                } else {
+                                    print("  X")
+                                }
+                            }
+                            print('\n')
+                        }
+                        print('\n')
+                    }
+
+                    var toAttack = character.positionAsPoint().adjacent().let { adjacentPoints ->
+                        characters
+                                .filter { c -> c.type != character.type }
+                                .filter { c -> c !in dead }
+                                .filter { ch -> adjacentPoints.any { p -> ch.x == p.x && ch.y == p.y } }
+                                .minBy { c -> c.health }
+                    }
+                    if (toAttack == null) {
+                        characters
+                                .filterNot { other -> other === character }
+                                .filter { other -> other.type != character.type }
+                                .filter { other -> other !in dead }
+                                //.also { println(it) }
+                                .flatMap { other -> other.positionAsPoint().adjacent() }
+                                //.also { println(it) }
+                                .filter { p -> arena[p.y][p.x] == '.' }
+                                //.also { println(it) }
+                                //.filter { p -> characters.filter { c -> c !in dead }.none { c -> c.y == p.y && c.x == p.x } } //After this all that are in range (as on website)
+                                .filter { p -> allReachable[p.y][p.x] > 0 } //Reachable
+                                //.also { println(it) }
+                                .minBy { p -> allReachable[p.y][p.x] }?.let { closest ->
+                                    val mapToSuccess = floodFill(closest, arena, characters.filter { c -> c !== character }.filter { c -> c !in dead })
+                                    val builder = StringBuilder()
+                                    mapToSuccess.forEach { thing ->
+                                        thing.forEach { num ->
+                                            if (num != Int.MIN_VALUE) {
+                                                builder.append(num.toString().padStart(3, ' '))
+                                            } else {
+                                                builder.append("  X")
+                                            }
+                                        }
+                                        builder.append('\n')
+                                    }
+
+                                    character.positionAsPoint().adjacent()
+                                            .filter { p -> mapToSuccess[p.y][p.x] != Int.MIN_VALUE }
+                                            .minBy { p -> mapToSuccess[p.y][p.x]}!!
+                                            .let { newP ->
+                                                character.y = newP.y
+                                                character.x = newP.x
+                                            }
+                                }
+                        toAttack = character.positionAsPoint().adjacent().let { adjacentPoints ->
+                            characters
+                                    .filter { c -> c.type != character.type }
+                                    .filter { c -> c !in dead }
+                                    .filter { ch -> adjacentPoints.any { p -> ch.x == p.x && ch.y == p.y } }
+                                    .minBy { c -> c.health }
+                        }
+                    }
+
+                    toAttack?.let {toAttack ->
+                        toAttack.getHit(character.attackPower)
+                        if (toAttack.health < 0) {
+
+                            dead.add(toAttack)
+                        }
+                    }
+
+                    if (dead.any { p -> p.type == Type.ELF })
+                        continue@outer
+                }
+                characters = characters.filter { c -> c !in dead }.sorted()
+                counter++
+            }
+
+            println("Round: $counter")
+            arena.printPlayfield(characters)
+            return "${counter * characters.sumBy { c -> c.health }}"
+        }
+
     }
 }
