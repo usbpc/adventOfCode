@@ -2,6 +2,7 @@ package advent2018
 
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
+import java.lang.StringBuilder
 import java.util.*
 
 class Day09(override val adventOfCode: AdventOfCode) : Day {
@@ -48,8 +49,53 @@ class Day09(override val adventOfCode: AdventOfCode) : Day {
         }
     }
 
+    class RinBufferplayfield(size : Int) {
+        val backingArray = IntArray(size)
+        var head = 0
+        var tail = 0
+
+        fun addLast(num : Int) {
+            backingArray[tail] = num
+            tail = (tail + 1) % backingArray.size
+        }
+
+        fun addFirst(num : Int) {
+            head = (head - 1 + backingArray.size) % backingArray.size
+            backingArray[head] = num
+        }
+
+        fun removeFirst() : Int {
+            val out = backingArray[head]
+            head = (head + 1) % backingArray.size
+            return out
+        }
+
+        fun removeLast() : Int {
+            //val out =
+            tail = (tail - 1 + backingArray.size) % backingArray.size
+            return backingArray[tail]
+        }
+
+        override fun toString(): String {
+            val out = StringBuilder()
+
+            var cur = head
+
+            out.append('[')
+            while (cur != tail) {
+                out.append(backingArray[cur])
+                out.append(',')
+                cur = (cur + 1) % backingArray.size
+            }
+            out.deleteCharAt(out.lastIndex)
+            out.append(']')
+            return out.toString()
+        }
+    }
+
     private fun calculateWinningScore(maxElf: Int, maxMarble: Int) : Long {
-        val playarea = CirclePlayfield(0)
+        val playarea = RinBufferplayfield((maxMarble - maxMarble / 23 + 1))
+        playarea.addLast(0)
 
         val scores = LongArray(maxElf)
 
@@ -59,9 +105,12 @@ class Day09(override val adventOfCode: AdventOfCode) : Day {
 
         while (nextMarbleNum <= maxMarble) {
             if (nextMarbleNum.isWorthPoints()) {
-                scores[currentElf] += playarea.removeMarble().toLong() + nextMarbleNum++
+                repeat(7) { playarea.addFirst(playarea.removeLast()) }
+                scores[currentElf] += playarea.removeLast().toLong() + nextMarbleNum++
+                playarea.addLast(playarea.removeFirst())
             } else {
-                playarea.insertMarble(nextMarbleNum++)
+                playarea.addLast(playarea.removeFirst())
+                playarea.addLast(nextMarbleNum++)
             }
             //println(playarea.printLikeAoc(currentElf+1, curMarble))
             currentElf = (currentElf+1) % maxElf

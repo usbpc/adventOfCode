@@ -9,12 +9,14 @@ class Day14(override val adventOfCode: AdventOfCode) : Day {
     private val input = adventOfCode.getInput(2018, day)
 
     private fun generateSequence() = sequence {
+        var counter = 2
         var firstElf = 0
         var secondElf = 1
         val scores = mutableListOf(3, 7)
         yield(3)
         yield(7)
         while (true) {
+            counter++
             var sum = scores[firstElf] + scores[secondElf]
             if (sum >= 10) {
                 val firstDigit = sum / 10
@@ -32,7 +34,7 @@ class Day14(override val adventOfCode: AdventOfCode) : Day {
 
     override fun part1() = generateSequence().drop(input.toInt()).take(10).fold(StringBuilder()) { str, score -> str.append(score) }.toString()
 
-    private infix fun List<Int>.match(that: List<Int>) : Boolean {
+    private infix fun List<Byte>.match(that: List<Byte>) : Boolean {
         if (this.size != that.size)
             return false
         for (i in 0..this.lastIndex) {
@@ -43,18 +45,24 @@ class Day14(override val adventOfCode: AdventOfCode) : Day {
     }
 
     override fun part2(): String {
-        val toFind = input.map { c -> c - '0' }
+        val sequence = generateSequence().take(100).toList()
+        for (j in 0..sequence.lastIndex) {
+            print((j + 1 + sequence[j]).toString().padStart(2, '0'))
+        }
+        print('\n')
+
+        val toFind = input.map { c -> (c - '0').toByte() }
         var firstElf = 4
         var secondElf = 3
-        val scores = mutableListOf(3, 7, 1, 0, 1, 0)
+        val scores = mutableListOf<Byte>(3, 7, 1, 0, 1, 0)
         while (true) {
-            var sum = scores[firstElf] + scores[secondElf]
+            var sum = (scores[firstElf] + scores[secondElf]).toByte()
             if (sum >= 10) {
-                val firstDigit = sum / 10
+                val firstDigit : Byte = (sum / 10).toByte()
                 scores.add(firstDigit)
                 if (toFind match  scores.subList(scores.lastIndex - 6, scores.lastIndex))
                     return (scores.lastIndex-toFind.size).toString()
-                sum %= 10
+                sum = (sum % 10).toByte()
             }
 
             scores.add(sum)
