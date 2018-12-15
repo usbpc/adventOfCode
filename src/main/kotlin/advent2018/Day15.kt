@@ -133,6 +133,50 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
         println(builder)
     }
 
+    private fun Fighter.doTurn(arena: List<List<Char>>, characters: List<Fighter>) : Fighter? {
+        val allReachable = floodFill(this.positionAsPoint(), arena, characters)
+
+        var toAttack = this.positionAsPoint().adjacent().let { adjacentPoints ->
+            characters
+                    .filter { c -> c.type != this.type }
+                    .filter { ch -> adjacentPoints.any { p -> ch.x == p.x && ch.y == p.y } }
+                    .minBy { c -> c.health }
+        }
+        if (toAttack == null) {
+            characters
+                    .filter { other -> other.type != this.type }
+                    .filterNot { other -> other === this }
+                    .flatMap { other -> other.positionAsPoint().adjacent() }
+                    .filter { p -> arena[p.y][p.x] == '.' }
+                    .filter { p -> allReachable[p.y][p.x] > 0 } //Reachable
+                    .minBy { p -> allReachable[p.y][p.x] }?.let { closest ->
+                        val mapToSuccess = floodFill(closest, arena, characters.filter { c -> c !== this })
+
+                        this.positionAsPoint().adjacent()
+                                .filter { p -> mapToSuccess[p.y][p.x] != Int.MIN_VALUE }
+                                .minBy { p -> mapToSuccess[p.y][p.x]}!!
+                                .let { newP ->
+                                    this.y = newP.y
+                                    this.x = newP.x
+                                }
+                    }
+            toAttack = this.positionAsPoint().adjacent().let { adjacentPoints ->
+                characters
+                        .filter { c -> c.type != this.type }
+                        .filter { ch -> adjacentPoints.any { p -> ch.x == p.x && ch.y == p.y } }
+                        .minBy { c -> c.health }
+            }
+        }
+
+        toAttack?.let { toAttack ->
+            toAttack.getHit(this.attackPower)
+            if (toAttack.health < 0) {
+                return toAttack
+            }
+        }
+        return null
+    }
+
     override fun part1(): String {
         var characters = characterList().sorted()
         val arena = inputSpaceArray()
@@ -149,49 +193,7 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
                 if (character in dead)
                     continue
 
-                val allReachable = floodFill(character.positionAsPoint(), arena, characters.filter { p -> p !in dead })
-
-                var toAttack = character.positionAsPoint().adjacent().let { adjacentPoints ->
-                    characters
-                            .filter { c -> c.type != character.type }
-                            .filter { c -> c !in dead }
-                            .filter { ch -> adjacentPoints.any { p -> ch.x == p.x && ch.y == p.y } }
-                            .minBy { c -> c.health }
-                }
-                if (toAttack == null) {
-                    characters
-                            .filter { other -> other.type != character.type }
-                            .filterNot { other -> other === character }
-                            .filter { other -> other !in dead }
-                            .flatMap { other -> other.positionAsPoint().adjacent() }
-                            .filter { p -> arena[p.y][p.x] == '.' }
-                            .filter { p -> allReachable[p.y][p.x] > 0 } //Reachable
-                            .minBy { p -> allReachable[p.y][p.x] }?.let { closest ->
-                                val mapToSuccess = floodFill(closest, arena, characters.filter { c -> c !== character }.filter { c -> c !in dead })
-
-                                character.positionAsPoint().adjacent()
-                                        .filter { p -> mapToSuccess[p.y][p.x] != Int.MIN_VALUE }
-                                        .minBy { p -> mapToSuccess[p.y][p.x]}!!
-                                        .let { newP ->
-                                            character.y = newP.y
-                                            character.x = newP.x
-                                        }
-                            }
-                    toAttack = character.positionAsPoint().adjacent().let { adjacentPoints ->
-                        characters
-                                .filter { c -> c.type != character.type }
-                                .filter { c -> c !in dead }
-                                .filter { ch -> adjacentPoints.any { p -> ch.x == p.x && ch.y == p.y } }
-                                .minBy { c -> c.health }
-                    }
-                }
-
-                toAttack?.let {toAttack ->
-                    toAttack.getHit(character.attackPower)
-                    if (toAttack.health < 0) {
-                        dead.add(toAttack)
-                    }
-                }
+                character.doTurn(arena, characters.filter { c -> c !in dead })?.let { justDied -> dead.add(justDied) }
             }
             characters = characters.filter { c -> c !in dead }.sorted()
             counter++
@@ -218,50 +220,8 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
                     if (character in dead)
                         continue
 
-                    val allReachable = floodFill(character.positionAsPoint(), arena, characters.filter { p -> p !in dead })
+                    character.doTurn(arena, characters.filter { c -> c !in dead })?.let { justDied -> dead.add(justDied) }
 
-                    var toAttack = character.positionAsPoint().adjacent().let { adjacentPoints ->
-                        characters
-                                .filter { c -> c.type != character.type }
-                                .filter { c -> c !in dead }
-                                .filter { ch -> adjacentPoints.any { p -> ch.x == p.x && ch.y == p.y } }
-                                .minBy { c -> c.health }
-                    }
-                    if (toAttack == null) {
-                        characters
-                                .filterNot { other -> other === character }
-                                .filter { other -> other.type != character.type }
-                                .filter { other -> other !in dead }
-                                .flatMap { other -> other.positionAsPoint().adjacent() }
-                                .filter { p -> arena[p.y][p.x] == '.' }
-                                .filter { p -> allReachable[p.y][p.x] > 0 } //Reachable
-                                .minBy { p -> allReachable[p.y][p.x] }?.let { closest ->
-                                    val mapToSuccess = floodFill(closest, arena, characters.filter { c -> c !== character }.filter { c -> c !in dead })
-
-                                    character.positionAsPoint().adjacent()
-                                            .filter { p -> mapToSuccess[p.y][p.x] != Int.MIN_VALUE }
-                                            .minBy { p -> mapToSuccess[p.y][p.x]}!!
-                                            .let { newP ->
-                                                character.y = newP.y
-                                                character.x = newP.x
-                                            }
-                                }
-                        toAttack = character.positionAsPoint().adjacent().let { adjacentPoints ->
-                            characters
-                                    .filter { c -> c.type != character.type }
-                                    .filter { c -> c !in dead }
-                                    .filter { ch -> adjacentPoints.any { p -> ch.x == p.x && ch.y == p.y } }
-                                    .minBy { c -> c.health }
-                        }
-                    }
-
-                    toAttack?.let {toAttack ->
-                        toAttack.getHit(character.attackPower)
-                        if (toAttack.health < 0) {
-
-                            dead.add(toAttack)
-                        }
-                    }
 
                     if (dead.any { p -> p.type == Type.ELF })
                         continue@outer
