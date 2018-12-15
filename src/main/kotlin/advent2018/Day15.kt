@@ -140,8 +140,6 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
         var counter = 0
 
         loop@while (characters.any { p -> p.type == Type.GOBLIN } && characters.any { p -> p.type == Type.ELF }) {
-            //println("Round: $counter")
-            //arena.printPlayfield(characters)
             val dead = mutableSetOf<Fighter>()
             for (character in characters) {
                 if (characters.filter { p -> p !in dead }.none { p -> p.type == Type.GOBLIN } || characters.filter { p -> p !in dead }.none { p -> p.type == Type.ELF }) {
@@ -153,20 +151,6 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
 
                 val allReachable = floodFill(character.positionAsPoint(), arena, characters.filter { p -> p !in dead })
 
-                if (false) {
-                    allReachable.forEach { thing ->
-                        thing.forEach { num ->
-                            if (num != Int.MIN_VALUE) {
-                                print(num.toString().padStart(3, ' '))
-                            } else {
-                                print("  X")
-                            }
-                        }
-                        print('\n')
-                    }
-                    print('\n')
-                }
-
                 var toAttack = character.positionAsPoint().adjacent().let { adjacentPoints ->
                     characters
                             .filter { c -> c.type != character.type }
@@ -176,30 +160,14 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
                 }
                 if (toAttack == null) {
                     characters
-                            .filterNot { other -> other === character }
                             .filter { other -> other.type != character.type }
+                            .filterNot { other -> other === character }
                             .filter { other -> other !in dead }
-                            //.also { println(it) }
                             .flatMap { other -> other.positionAsPoint().adjacent() }
-                            //.also { println(it) }
                             .filter { p -> arena[p.y][p.x] == '.' }
-                            //.also { println(it) }
-                            //.filter { p -> characters.filter { c -> c !in dead }.none { c -> c.y == p.y && c.x == p.x } } //After this all that are in range (as on website)
                             .filter { p -> allReachable[p.y][p.x] > 0 } //Reachable
-                            //.also { println(it) }
                             .minBy { p -> allReachable[p.y][p.x] }?.let { closest ->
                                 val mapToSuccess = floodFill(closest, arena, characters.filter { c -> c !== character }.filter { c -> c !in dead })
-                                val builder = StringBuilder()
-                                mapToSuccess.forEach { thing ->
-                                    thing.forEach { num ->
-                                        if (num != Int.MIN_VALUE) {
-                                            builder.append(num.toString().padStart(3, ' '))
-                                        } else {
-                                            builder.append("  X")
-                                        }
-                                    }
-                                    builder.append('\n')
-                                }
 
                                 character.positionAsPoint().adjacent()
                                         .filter { p -> mapToSuccess[p.y][p.x] != Int.MIN_VALUE }
@@ -229,9 +197,6 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
             counter++
         }
 
-        println("Round: $counter")
-        arena.printPlayfield(characters)
-
         return "${counter * characters.sumBy { c -> c.health }}"
     }
 
@@ -244,8 +209,6 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
             var counter = 0
 
             loop@while (characters.any { p -> p.type == Type.GOBLIN } && characters.any { p -> p.type == Type.ELF }) {
-                //println("Round: $counter")
-                //arena.printPlayfield(characters)
                 val dead = mutableSetOf<Fighter>()
                 for (character in characters) {
                     if (characters.filter { p -> p !in dead }.none { p -> p.type == Type.GOBLIN } || characters.filter { p -> p !in dead }.none { p -> p.type == Type.ELF }) {
@@ -256,20 +219,6 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
                         continue
 
                     val allReachable = floodFill(character.positionAsPoint(), arena, characters.filter { p -> p !in dead })
-
-                    if (false) {
-                        allReachable.forEach { thing ->
-                            thing.forEach { num ->
-                                if (num != Int.MIN_VALUE) {
-                                    print(num.toString().padStart(3, ' '))
-                                } else {
-                                    print("  X")
-                                }
-                            }
-                            print('\n')
-                        }
-                        print('\n')
-                    }
 
                     var toAttack = character.positionAsPoint().adjacent().let { adjacentPoints ->
                         characters
@@ -283,27 +232,11 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
                                 .filterNot { other -> other === character }
                                 .filter { other -> other.type != character.type }
                                 .filter { other -> other !in dead }
-                                //.also { println(it) }
                                 .flatMap { other -> other.positionAsPoint().adjacent() }
-                                //.also { println(it) }
                                 .filter { p -> arena[p.y][p.x] == '.' }
-                                //.also { println(it) }
-                                //.filter { p -> characters.filter { c -> c !in dead }.none { c -> c.y == p.y && c.x == p.x } } //After this all that are in range (as on website)
                                 .filter { p -> allReachable[p.y][p.x] > 0 } //Reachable
-                                //.also { println(it) }
                                 .minBy { p -> allReachable[p.y][p.x] }?.let { closest ->
                                     val mapToSuccess = floodFill(closest, arena, characters.filter { c -> c !== character }.filter { c -> c !in dead })
-                                    val builder = StringBuilder()
-                                    mapToSuccess.forEach { thing ->
-                                        thing.forEach { num ->
-                                            if (num != Int.MIN_VALUE) {
-                                                builder.append(num.toString().padStart(3, ' '))
-                                            } else {
-                                                builder.append("  X")
-                                            }
-                                        }
-                                        builder.append('\n')
-                                    }
 
                                     character.positionAsPoint().adjacent()
                                             .filter { p -> mapToSuccess[p.y][p.x] != Int.MIN_VALUE }
@@ -337,8 +270,6 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
                 counter++
             }
 
-            println("Round: $counter")
-            arena.printPlayfield(characters)
             return "${counter * characters.sumBy { c -> c.health }}"
         }
 
