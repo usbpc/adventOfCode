@@ -60,43 +60,8 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
                 }
     }
 
-    private fun floodFill(from: Point, area: List<List<Char>>, fighters: List<Fighter>) : Array<IntArray> {
-        val out = Array(area.size) { IntArray(area.first().size) }
-
-        area.forEachIndexed { y, list ->
-            list.forEachIndexed { x, c ->
-                if (c == '#')
-                    out[y][x] = Int.MIN_VALUE
-            }
-        }
-
-        fighters
-                .filterNot { f -> f.x == from.x && f.y == from.y }
-                .forEach { fighter ->
-            out[fighter.y][fighter.x] = Int.MIN_VALUE
-        }
-
-        val queue = ArrayDeque<Point>()
-        queue.add(Point(from.x, from.y))
-
-        while(queue.isNotEmpty()) {
-            val cur = queue.poll()
-            cur.adjacent()
-                    .filter { p -> p.y >= 0 && p.x >= 0 && p.y < area.size && p.x < area.first().size}
-                    .filter { p -> out[p.y][p.x] != Int.MIN_VALUE }
-                    .filter { p -> p != from }
-                    .filter { p -> out[p.y][p.x] == 0 }
-                    .forEach { p ->
-                        queue.add(p)
-                        out[p.y][p.x] = out[cur.y][cur.x] + 1
-                    }
-        }
-
-        return out
-    }
-
     @Suppress("unused")
-    private fun List<List<Char>>.printPlayfield(fighters: List<Fighter>) {
+    private fun List<List<Char>>.printPlayfield(fighters: List<Fighter>) : String {
         val builder = StringBuilder()
         this.forEachIndexed { y, list ->
             val fightersInLine = mutableListOf<Fighter>()
@@ -127,12 +92,60 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
             }
             builder.append('\n')
         }
-        println(builder)
+        return builder.toString()
+    }
+
+    private fun Collection<Point>.getClosestTo(from: Point, area: List<List<Char>>, fighters: List<Fighter>) : Point? {
+        if (from in this)
+            return from
+
+        val out = Array(area.size) { IntArray(area.first().size) }
+
+        area.forEachIndexed { y, list ->
+            list.forEachIndexed { x, c ->
+                if (c == '#')
+                    out[y][x] = Int.MIN_VALUE
+            }
+        }
+
+        fighters
+                .filterNot { f -> f.x == from.x && f.y == from.y }
+                .forEach { fighter ->
+                    out[fighter.y][fighter.x] = Int.MIN_VALUE
+                }
+
+        val queue = ArrayDeque<Point>()
+        queue.add(from)
+        var lastDistance = Int.MIN_VALUE
+
+        val found = mutableSetOf<Point>()
+
+        while(queue.isNotEmpty()) {
+            val cur = queue.poll()
+
+            if (found.isNotEmpty() && lastDistance < out[cur.y][cur.x])
+                return found.min()!!
+
+            lastDistance = out[cur.y][cur.x]
+
+            cur.adjacent()
+                    .filter { p -> p.y >= 0 && p.x >= 0 && p.y < area.size && p.x < area.first().size}
+                    .filter { p -> out[p.y][p.x] != Int.MIN_VALUE }
+                    .filter { p -> p != from }
+                    .filter { p -> out[p.y][p.x] == 0 }
+                    .forEach { p ->
+                        if (p in this)
+                            found.add(p)
+                        queue.add(p)
+                        out[p.y][p.x] = out[cur.y][cur.x] + 1
+                    }
+        }
+
+        return found.min()
     }
 
     private fun Fighter.doTurn(arena: List<List<Char>>, fighters: List<Fighter>) : Fighter? {
         val characters = fighters.sorted()
-        val allReachable = floodFill(this.positionAsPoint(), arena, characters)
 
         var toAttack = this.positionAsPoint().adjacent().let { adjacentPoints ->
             characters
@@ -145,13 +158,9 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
                     .filter { other -> other.type != this.type }
                     .filterNot { other -> other === this }
                     .flatMap { other -> other.positionAsPoint().adjacent() }
-                    .filter { p -> allReachable[p.y][p.x] > 0 } //Reachable
-                    .minBy { p -> allReachable[p.y][p.x] }?.let { closest ->
-                        val mapToSuccess = floodFill(closest, arena, characters.filter { c -> c !== this })
-
+                    .getClosestTo(this.positionAsPoint(), arena, fighters)?.let { closest ->
                         this.positionAsPoint().adjacent()
-                                .filter { p -> mapToSuccess[p.y][p.x] != Int.MIN_VALUE }
-                                .minBy { p -> mapToSuccess[p.y][p.x]}!!
+                                .getClosestTo(closest, arena, characters.filter { c -> c !== this })!!
                                 .let { newP ->
                                     this.y = newP.y
                                     this.x = newP.x
@@ -183,9 +192,11 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
         loop@while (characters.any { c -> c.type == Type.GOBLIN } && characters.any { c -> c.type == Type.ELF }) {
             val dead = mutableSetOf<Fighter>()
             for (character in characters) {
+
                 if (characters.none { c -> c.type == Type.GOBLIN } || characters.none { c -> c.type == Type.ELF }) {
                     break@loop
                 }
+
                 if (character in dead)
                     continue
 
@@ -197,11 +208,7 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
             }
             characters = characters.sorted()
             counter++
-            //println("Round: $counter")
-            //arena.printPlayfield(characters)
         }
-        //println("Round: $counter")
-        //arena.printPlayfield(characters)
         return "${counter * characters.sumBy { c -> c.health }}"
     }
 
@@ -233,11 +240,7 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
                 }
                 characters = characters.sorted()
                 counter++
-                //println("Round: $counter")
-                //arena.printPlayfield(characters)
             }
-            //println("Round: $counter")
-            //arena.printPlayfield(characters)
 
             return "${counter * characters.sumBy { c -> c.health }}"
         }
