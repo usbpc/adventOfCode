@@ -3,7 +3,6 @@ package advent2018
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
 import java.util.*
-import kotlin.math.abs
 
 class Day15(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 15
@@ -27,9 +26,6 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
                 } else {
                     this.y - other.y
                 }
-        fun distanceTo(other: Fighter) : Int {
-            return abs(x - other.x) + abs(y - other.y)
-        }
 
         fun positionAsPoint() = Point(x, y)
     }
@@ -64,7 +60,7 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
                 }
     }
 
-    fun floodFill(from: Point, area: List<List<Char>>, fighters: List<Fighter>) : Array<IntArray> {
+    private fun findClosest(from: Point, area: List<List<Char>>, fighters: List<Fighter>) : Array<IntArray> {
         val out = Array(area.size) { IntArray(area.first().size) }
 
         area.forEachIndexed { y, list ->
@@ -99,14 +95,15 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
         return out
     }
 
+    @Suppress("unused")
     private fun List<List<Char>>.printPlayfield(fighters: List<Fighter>) {
         val builder = StringBuilder()
         this.forEachIndexed { y, list ->
-            val units = mutableListOf<Fighter>()
+            val fightersInLine = mutableListOf<Fighter>()
             list.forEachIndexed { x, c ->
                 val occupied = fighters.singleOrNull { f -> f.x == x && f.y == y }
                 if (occupied != null) {
-                    units.add(occupied)
+                    fightersInLine.add(occupied)
                     when (occupied.type) {
                         Type.ELF -> builder.append('E')
                         Type.GOBLIN -> builder.append('G')
@@ -116,7 +113,7 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
                 }
             }
             builder.append("  ")
-            units.forEach { f ->
+            fightersInLine.forEach { f ->
                 when (f.type) {
                     Type.ELF -> builder.append('E')
                     Type.GOBLIN -> builder.append('G')
@@ -125,7 +122,7 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
                 builder.append(f.health)
                 builder.append("), ")
             }
-            if (units.isNotEmpty()) {
+            if (fightersInLine.isNotEmpty()) {
                 repeat(2) { builder.deleteCharAt(builder.lastIndex) }
             }
             builder.append('\n')
@@ -133,13 +130,14 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
         println(builder)
     }
 
-    private fun Fighter.doTurn(arena: List<List<Char>>, characters: List<Fighter>) : Fighter? {
-        val allReachable = floodFill(this.positionAsPoint(), arena, characters)
+    private fun Fighter.doTurn(arena: List<List<Char>>, fighters: List<Fighter>) : Fighter? {
+        val characters = fighters.sorted()
+        val allReachable = findClosest(this.positionAsPoint(), arena, characters)
 
         var toAttack = this.positionAsPoint().adjacent().let { adjacentPoints ->
             characters
                     .filter { c -> c.type != this.type }
-                    .filter { ch -> adjacentPoints.any { p -> ch.x == p.x && ch.y == p.y } }
+                    .filter { c -> adjacentPoints.any { p -> c.x == p.x && c.y == p.y } }
                     .minBy { c -> c.health }
         }
         if (toAttack == null) {
@@ -150,7 +148,7 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
                     .filter { p -> arena[p.y][p.x] == '.' }
                     .filter { p -> allReachable[p.y][p.x] > 0 } //Reachable
                     .minBy { p -> allReachable[p.y][p.x] }?.let { closest ->
-                        val mapToSuccess = floodFill(closest, arena, characters.filter { c -> c !== this })
+                        val mapToSuccess = findClosest(closest, arena, characters.filter { c -> c !== this })
 
                         this.positionAsPoint().adjacent()
                                 .filter { p -> mapToSuccess[p.y][p.x] != Int.MIN_VALUE }
@@ -163,15 +161,15 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
             toAttack = this.positionAsPoint().adjacent().let { adjacentPoints ->
                 characters
                         .filter { c -> c.type != this.type }
-                        .filter { ch -> adjacentPoints.any { p -> ch.x == p.x && ch.y == p.y } }
+                        .filter { c -> adjacentPoints.any { p -> c.x == p.x && c.y == p.y } }
                         .minBy { c -> c.health }
             }
         }
 
-        toAttack?.let { toAttack ->
-            toAttack.getHit(this.attackPower)
-            if (toAttack.health < 0) {
-                return toAttack
+        toAttack?.let { victim ->
+            victim.getHit(this.attackPower)
+            if (victim.health < 0) {
+                return victim
             }
         }
         return null
@@ -183,19 +181,22 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
 
         var counter = 0
 
-        loop@while (characters.any { p -> p.type == Type.GOBLIN } && characters.any { p -> p.type == Type.ELF }) {
+        loop@while (characters.any { c -> c.type == Type.GOBLIN } && characters.any { c -> c.type == Type.ELF }) {
             val dead = mutableSetOf<Fighter>()
             for (character in characters) {
-                if (characters.filter { p -> p !in dead }.none { p -> p.type == Type.GOBLIN } || characters.filter { p -> p !in dead }.none { p -> p.type == Type.ELF }) {
-                    characters = characters.filter { c -> c !in dead }.sorted()
+                if (characters.none { c -> c.type == Type.GOBLIN } || characters.none { c -> c.type == Type.ELF }) {
                     break@loop
                 }
                 if (character in dead)
                     continue
 
-                character.doTurn(arena, characters.filter { c -> c !in dead })?.let { justDied -> dead.add(justDied) }
+                character.doTurn(arena, characters)
+                        ?.let { justDied ->
+                            dead.add(justDied)
+                            characters = characters.filter { c -> c !== justDied }
+                        }
             }
-            characters = characters.filter { c -> c !in dead }.sorted()
+            characters = characters.sorted()
             counter++
         }
 
@@ -210,23 +211,25 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
 
             var counter = 0
 
-            loop@while (characters.any { p -> p.type == Type.GOBLIN } && characters.any { p -> p.type == Type.ELF }) {
+            loop@while (characters.any { c -> c.type == Type.GOBLIN } && characters.any { c -> c.type == Type.ELF }) {
                 val dead = mutableSetOf<Fighter>()
                 for (character in characters) {
-                    if (characters.filter { p -> p !in dead }.none { p -> p.type == Type.GOBLIN } || characters.filter { p -> p !in dead }.none { p -> p.type == Type.ELF }) {
-                        characters = characters.filter { c -> c !in dead }.sorted()
+                    if (characters.none { c -> c.type == Type.GOBLIN } || characters.none { c -> c.type == Type.ELF }) {
                         break@loop
                     }
                     if (character in dead)
                         continue
 
-                    character.doTurn(arena, characters.filter { c -> c !in dead })?.let { justDied -> dead.add(justDied) }
-
-
-                    if (dead.any { p -> p.type == Type.ELF })
-                        continue@outer
+                    if (
+                            character.doTurn(arena, characters)
+                                ?.let { justDied ->
+                                    dead.add(justDied)
+                                    characters = characters.filter { c -> c !== justDied }
+                                    justDied.type == Type.ELF
+                                } == true
+                    ) { continue@outer }
                 }
-                characters = characters.filter { c -> c !in dead }.sorted()
+                characters = characters.sorted()
                 counter++
             }
 
