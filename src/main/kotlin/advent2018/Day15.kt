@@ -60,7 +60,7 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
                 }
     }
 
-    private fun findClosest(from: Point, area: List<List<Char>>, fighters: List<Fighter>) : Array<IntArray> {
+    private fun floodFill(from: Point, area: List<List<Char>>, fighters: List<Fighter>) : Array<IntArray> {
         val out = Array(area.size) { IntArray(area.first().size) }
 
         area.forEachIndexed { y, list ->
@@ -132,7 +132,7 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
 
     private fun Fighter.doTurn(arena: List<List<Char>>, fighters: List<Fighter>) : Fighter? {
         val characters = fighters.sorted()
-        val allReachable = findClosest(this.positionAsPoint(), arena, characters)
+        val allReachable = floodFill(this.positionAsPoint(), arena, characters)
 
         var toAttack = this.positionAsPoint().adjacent().let { adjacentPoints ->
             characters
@@ -145,10 +145,9 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
                     .filter { other -> other.type != this.type }
                     .filterNot { other -> other === this }
                     .flatMap { other -> other.positionAsPoint().adjacent() }
-                    .filter { p -> arena[p.y][p.x] == '.' }
                     .filter { p -> allReachable[p.y][p.x] > 0 } //Reachable
                     .minBy { p -> allReachable[p.y][p.x] }?.let { closest ->
-                        val mapToSuccess = findClosest(closest, arena, characters.filter { c -> c !== this })
+                        val mapToSuccess = floodFill(closest, arena, characters.filter { c -> c !== this })
 
                         this.positionAsPoint().adjacent()
                                 .filter { p -> mapToSuccess[p.y][p.x] != Int.MIN_VALUE }
