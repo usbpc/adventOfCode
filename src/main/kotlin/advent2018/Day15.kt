@@ -167,7 +167,7 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
 
         toAttack?.let { victim ->
             victim.getHit(this.attackPower)
-            if (victim.health < 0) {
+            if (victim.health <= 0) {
                 return victim
             }
         }
@@ -197,8 +197,11 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
             }
             characters = characters.sorted()
             counter++
+            //println("Round: $counter")
+            //arena.printPlayfield(characters)
         }
-
+        //println("Round: $counter")
+        //arena.printPlayfield(characters)
         return "${counter * characters.sumBy { c -> c.health }}"
     }
 
@@ -230,7 +233,11 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
                 }
                 characters = characters.sorted()
                 counter++
+                //println("Round: $counter")
+                //arena.printPlayfield(characters)
             }
+            //println("Round: $counter")
+            //arena.printPlayfield(characters)
 
             return "${counter * characters.sumBy { c -> c.health }}"
         }
