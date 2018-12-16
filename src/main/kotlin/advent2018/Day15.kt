@@ -95,13 +95,13 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
         return builder.toString()
     }
 
-    private fun Collection<Point>.getClosestTo(from: Point, area: List<List<Char>>, fighters: List<Fighter>) : Point? {
-        if (from in this)
-            return from
+    private fun Collection<Point>.getClosestTo(point: Point, arena: List<List<Char>>, fighters: List<Fighter>) : Point? {
+        if (point in this)
+            return point
 
-        val out = Array(area.size) { IntArray(area.first().size) }
+        val out = Array(arena.size) { IntArray(arena.first().size) }
 
-        area.forEachIndexed { y, list ->
+        arena.forEachIndexed { y, list ->
             list.forEachIndexed { x, c ->
                 if (c == '#')
                     out[y][x] = Int.MIN_VALUE
@@ -109,13 +109,13 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
         }
 
         fighters
-                .filterNot { f -> f.x == from.x && f.y == from.y }
+                .filterNot { f -> f.x == point.x && f.y == point.y }
                 .forEach { fighter ->
                     out[fighter.y][fighter.x] = Int.MIN_VALUE
                 }
 
         val queue = ArrayDeque<Point>()
-        queue.add(from)
+        queue.add(point)
         var lastDistance = Int.MIN_VALUE
 
         val found = mutableSetOf<Point>()
@@ -124,14 +124,14 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
             val cur = queue.poll()
 
             if (found.isNotEmpty() && lastDistance < out[cur.y][cur.x])
-                return found.min()!!
+                return found.min()
 
             lastDistance = out[cur.y][cur.x]
 
             cur.adjacent()
-                    .filter { p -> p.y >= 0 && p.x >= 0 && p.y < area.size && p.x < area.first().size}
+                    .filter { p -> p.y >= 0 && p.x >= 0 && p.y < arena.size && p.x < arena.first().size}
                     .filter { p -> out[p.y][p.x] != Int.MIN_VALUE }
-                    .filter { p -> p != from }
+                    .filter { p -> p != point }
                     .filter { p -> out[p.y][p.x] == 0 }
                     .forEach { p ->
                         if (p in this)
