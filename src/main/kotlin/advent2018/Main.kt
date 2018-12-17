@@ -22,8 +22,8 @@ fun main(args: Array<String>) {
         //add(Day13(adventOfCode))
         //add(Day14(adventOfCode))
         //add(Day15(adventOfCode))
-        add(Day16(adventOfCode))
-        //add(Day17(adventOfCode))
+        //add(Day16(adventOfCode))
+        add(Day17(adventOfCode))
         //add(Day18(adventOfCode))
         //add(Day19(adventOfCode))
         //add(Day20(adventOfCode))
@@ -37,7 +37,6 @@ fun main(args: Array<String>) {
         println("Please specify session id!")
         return
     }
-
     list.forEach {day ->
         val stringBuilder = StringBuilder()
         stringBuilder.appendln("---------------- Day ${day.day.toString().padStart(2, '0')} ----------------")

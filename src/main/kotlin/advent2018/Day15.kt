@@ -129,7 +129,7 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
             lastDistance = out[cur.y][cur.x]
 
             cur.adjacent()
-                    .filter { p -> p.y >= 0 && p.x >= 0 && p.y < arena.size && p.x < arena.first().size}
+                    .filter { p -> p.y >= 0 && p.x >= 0 && p.y < arena.size && p.x < arena.first().size }
                     .filter { p -> out[p.y][p.x] != Int.MIN_VALUE }
                     .filter { p -> p != point }
                     .filter { p -> out[p.y][p.x] == 0 }

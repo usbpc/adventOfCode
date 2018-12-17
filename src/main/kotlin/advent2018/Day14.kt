@@ -46,10 +46,6 @@ class Day14(override val adventOfCode: AdventOfCode) : Day {
 
     override fun part2(): String {
         val sequence = generateSequence().take(100).toList()
-        for (j in 0..sequence.lastIndex) {
-            print((j + 1 + sequence[j]).toString().padStart(2, '0'))
-        }
-        print('\n')
 
         val toFind = input.map { c -> (c - '0').toByte() }
         var firstElf = 4

@@ -138,8 +138,9 @@ class Day13(override val adventOfCode: AdventOfCode) : Day {
         while (true) {
             for (cart in carts) {
                 cart.stepOnce()
-                if (carts.filter { it !== cart }.any { otherCart -> cart.y == otherCart.y && cart.x == otherCart.x })
+                if (carts.filter { it !== cart }.any { otherCart -> cart.y == otherCart.y && cart.x == otherCart.x }) {
                     return "${cart.x},${cart.y}"
+                }
             }
             carts = carts.sorted()
         }
@@ -149,9 +150,10 @@ class Day13(override val adventOfCode: AdventOfCode) : Day {
 
     override fun part2(): String {
         var carts = parseInput()
-
+        var ticks = 0
         while (carts.size > 1) {
             val cartsToMove = carts.sorted().toMutableList()
+            ticks++
             while (cartsToMove.isNotEmpty()) {
                 val movedCart = cartsToMove.pop()
                 movedCart.stepOnce()
@@ -161,7 +163,7 @@ class Day13(override val adventOfCode: AdventOfCode) : Day {
                 }
             }
         }
-
+        println("It took $ticks")
         val cart = carts.single()
         return "${cart.x},${cart.y}"
     }

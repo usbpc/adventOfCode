@@ -4,74 +4,55 @@ import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
 import java.util.*
 
-fun IntArray.applyOperation(op: Day16.Operations, A: Int, B: Int, C: Int) {
-    when(op) {
-        Day16.Operations.ADDR -> this[C] = this[A] + this[B]
-        Day16.Operations.ADDI -> this[C] = this[A] + B
-        Day16.Operations.MULR -> this[C] = this[A] * this[B]
-        Day16.Operations.MULI -> this[C] = this[A] * B
-        Day16.Operations.BANR -> this[C] = this[A] and this[B]
-        Day16.Operations.BANI -> this[C] = this[A] and B
-        Day16.Operations.BORR -> this[C] = this[A] or this[B]
-        Day16.Operations.BORI -> this[C] = this[A] or B
-        Day16.Operations.SETR -> this[C] = this[A]
-        Day16.Operations.SETI -> this[C] = A
-        Day16.Operations.GTIR -> {
-            if (A > this[B])
-                this[C] = 1
-            else
-                this[C] = 0
-        }
-        Day16.Operations.GTRI -> {
-            if (this[A] > B)
-                this[C] = 1
-            else
-                this[C] = 0
-        }
-        Day16.Operations.GTRR -> {
-            if (this[A] > this[B])
-                this[C] = 1
-            else
-                this[C] = 0
-        }
-        Day16.Operations.EQIR -> {
-            if (A == this[B])
-                this[C] = 1
-            else
-                this[C] = 0
-        }
-        Day16.Operations.EQRI -> {
-            if (this[A] == B)
-                this[C] = 1
-            else
-                this[C] = 0
-        }
-        Day16.Operations.EQRR -> {
-            if (this[A] == this[B])
-                this[C] = 1
-            else
-                this[C] = 0
-        }
-    }
-}
-
 class Day16(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 16
-    private val instRegex = """Before: \[\d+, \d+, \d+, \d+]\n\d+ \d+ \d+ \d+\nAfter:  \[\d+, \d+, \d+, \d+]""".toRegex()
     private val input = adventOfCode.getInput(2018, day).split("\n\n\n\n")
-
+    
+    companion object {
+        @Suppress("SpellCheckingInspection")
+        private enum class Operation {
+            ADDR, ADDI,
+            MULR, MULI,
+            BANR, BANI,
+            BORR, BORI,
+            SETR, SETI,
+            GTIR, GTRI, GTRR,
+            EQIR, EQRI, EQRR
+        }
+        
+        @JvmStatic
+        private fun IntArray.applyOperation(op: Operation, A: Int, B: Int, C: Int) {
+            when(op) {
+                Operation.ADDR -> this[C] = this[A] + this[B]
+                Operation.ADDI -> this[C] = this[A] + B
+                Operation.MULR -> this[C] = this[A] * this[B]
+                Operation.MULI -> this[C] = this[A] * B
+                Operation.BANR -> this[C] = this[A] and this[B]
+                Operation.BANI -> this[C] = this[A] and B
+                Operation.BORR -> this[C] = this[A] or this[B]
+                Operation.BORI -> this[C] = this[A] or B
+                Operation.SETR -> this[C] = this[A]
+                Operation.SETI -> this[C] = A
+                Operation.GTIR -> if (A > this[B]) this[C] = 1 else this[C] = 0
+                Operation.GTRI -> if (this[A] > B) this[C] = 1 else this[C] = 0
+                Operation.GTRR -> if (this[A] > this[B]) this[C] = 1 else this[C] = 0
+                Operation.EQIR -> if (A == this[B]) this[C] = 1 else this[C] = 0
+                Operation.EQRI -> if (this[A] == B) this[C] = 1 else this[C] = 0
+                Operation.EQRR -> if (this[A] == this[B]) this[C] = 1 else this[C] = 0
+            }
+        }
+    }
     private class TestCase(val preRegisters : IntArray, val inst: IntArray, val postRegisters : IntArray) {
-        var matches = 0
-        val possibleInstructions = mutableSetOf<Operations>()
+        val possibleInstructions = mutableSetOf<Operation>()
         fun testAllOpcodes() {
-            for (op in Operations.values()) {
-                val applied = preRegisters.copyOf()
-                applied.applyOperation(op, inst[1], inst[2], inst[3])
-
-                if (Arrays.equals(postRegisters, applied)) {
-                    possibleInstructions.add(op)
-                    matches++
+            for (op in Operation.values()) {
+                val applied = preRegisters.copyOf().apply {
+                    applyOperation(op, inst[1], inst[2], inst[3])
                 }
+
+                if (Arrays.equals(postRegisters, applied))
+                    possibleInstructions.add(op)
+
             }
         }
     }
@@ -81,40 +62,24 @@ class Day16(override val adventOfCode: AdventOfCode) : Day {
             TestCase(lines[0].extractInts(), lines[1].extractInts(), lines[2].extractInts())
         }
 
-    enum class Operations {
-        ADDR,
-        ADDI,
-        MULR,
-        MULI,
-        BANR,
-        BANI,
-        BORR,
-        BORI,
-        SETR,
-        SETI,
-        GTIR,
-        GTRI,
-        GTRR,
-        EQIR,
-        EQRI,
-        EQRR
+    
 
-    }
+    override fun part1(): String =
+            input[0].getTestCases()
+                    .onEach { testCase ->  testCase.testAllOpcodes() }
+                    .count { it.possibleInstructions.size >= 3 }
+                    .toString()
 
-    override fun part1(): String {
-        val testCases = input[0].getTestCases()
-        testCases.forEach { it.testAllOpcodes() }
-        return testCases.filter { it.matches >= 3 }.count().toString()
-    }
 
     override fun part2(): String {
         val testCases = input[0].getTestCases()
-        testCases.forEach { it.testAllOpcodes() }
+                .onEach { testCase -> testCase.testAllOpcodes() }
 
-        val possibles = testCases.groupBy { it.inst[0] }
+        val possibles = testCases
+                .groupBy { it.inst[0] }
                 .map { (opcode, list) ->
                     val base = list.first().possibleInstructions
-                    opcode to list.drop(1).fold(base as Set<Operations>) { acc, testCase -> acc.intersect(testCase.possibleInstructions) }.toMutableSet()
+                    opcode to list.drop(1).fold(base as Set<Operation>) { acc, testCase -> acc.intersect(testCase.possibleInstructions) }.toMutableSet()
                 }
                 .sortedBy { it.first }
 
@@ -137,7 +102,6 @@ class Day16(override val adventOfCode: AdventOfCode) : Day {
 
         val opcodeMap = possibles.map { it.first to it.second.single() }.toMap()
 
-        println(opcodeMap)
 
         val initialRegisters = IntArray(4)
 
