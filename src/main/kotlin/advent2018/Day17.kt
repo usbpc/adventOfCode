@@ -10,6 +10,10 @@ class Day17(override val adventOfCode: AdventOfCode) : Day {
     private val input = adventOfCode.getInput(2018, day).lines()
 
     data class Point(val x: Int, val y: Int) : Comparable<Point> {
+        companion object {
+            fun fromRange(xes: IntRange, y: Int) = xes.map { x -> Point(x, y) }
+            fun fromRange(x: Int, yes: IntRange) = yes.map { y -> Point(x, y) }
+        }
         override fun compareTo(other: Point): Int =
                 if (this.y == other.y) {
                     this.x - other.x
@@ -49,6 +53,7 @@ class Day17(override val adventOfCode: AdventOfCode) : Day {
 
         val ground = Array(maxY+1) { IntArray(maxX - minX + 3) }
 
+
         val spring = Point(500 - minX + 1, 0)
         for (y in 0..maxY) {
             for (x in minX..maxX) {
@@ -56,13 +61,13 @@ class Day17(override val adventOfCode: AdventOfCode) : Day {
                     ground[y][x - minX + 1] = Int.MIN_VALUE
             }
         }
-
         //println(ground.getGroundString())
-        val queue = ArrayDeque<Point>()
+        //println(ground.getGroundString())
+        val queue = Stack<Point>()
         queue.add(spring.down())
 
         while (queue.isNotEmpty()) {
-            val cur = queue.poll()
+            val cur = queue.pop()
             if (cur.y < 0)
                 continue
             val down = cur.down()
@@ -79,14 +84,10 @@ class Day17(override val adventOfCode: AdventOfCode) : Day {
 
                         for (x in toFill.x..right) {
                             if (ground[toFill.y+1][x] == 0) {
-                                //if (ground[toFill.y+1][x] == Int.MIN_VALUE) {
                                 val toAdd = Point(x, toFill.y)
-                                if (queue.contains(toAdd)) {
-                                    Unit
-                                } else {
-                                    queue.add(toAdd)
-                                }
-                                //}
+                                if (!queue.contains(toAdd))
+                                    queue.push(toAdd)
+
                                 shouldContinue = false
                                 break
                             } else if (ground[toFill.y+1][x] == 2) {
@@ -99,11 +100,9 @@ class Day17(override val adventOfCode: AdventOfCode) : Day {
                         for (x in toFill.x downTo left) {
                             if (ground[toFill.y+1][x] == 0) {
                                 val toAdd = Point(x, toFill.y)
-                                if (queue.contains(toAdd)) {
-                                    Unit
-                                } else {
-                                    queue.add(toAdd)
-                                }
+                                if (!queue.contains(toAdd))
+                                    queue.push(toAdd)
+
                                 shouldContinue = false
                                 break
                             } else if (ground[toFill.y+1][x] == 2) {
@@ -146,16 +145,18 @@ class Day17(override val adventOfCode: AdventOfCode) : Day {
     }
 
     override fun part1(): String {
-        val fixedY = input.filter { line -> line.startsWith("y") }.map { it.extractInts() }.flatMap { fixedY -> (fixedY[1]..fixedY[2]).map { x -> Point(x, fixedY[0]) } }
-        val fixedX = input.filter { line -> line.startsWith("x") }.map { it.extractInts() }.flatMap { fixedX -> (fixedX[1]..fixedX[2]).map { y -> Point(fixedX[0], y) } }
-        val all = (fixedX + fixedY).toSet()
+        val all = input.flatMap { line ->
+            val numbers = line.extractInts()
+            when(line[0]) {
+                'y' -> Point.fromRange(numbers[1]..numbers[2], numbers[0])
+                'x' -> Point.fromRange(numbers[0], numbers[1]..numbers[2])
+                else -> throw IllegalStateException("Malformed input, line started with ${line[0]}")
+            }
+        }.toSet()
 
         val ground = generateWaterMap(all)
 
         val minY = all.minBy { it.y }!!.y
-
-
-        //println(ground.getGroundString())
 
         return "" + ground.filterIndexed{ y, _ -> y >= minY }.flatMap { it.asIterable() }.count { it == 1 || it == 2 }
     }
@@ -174,9 +175,14 @@ class Day17(override val adventOfCode: AdventOfCode) : Day {
     fun Array<IntArray>.getPoint(point: Point) = this[point.y][point.x]
     
     override fun part2(): String {
-        val fixedY = input.filter { line -> line.startsWith("y") }.map { it.extractInts() }.flatMap { fixedY -> (fixedY[1]..fixedY[2]).map { x -> Point(x, fixedY[0]) } }
-        val fixedX = input.filter { line -> line.startsWith("x") }.map { it.extractInts() }.flatMap { fixedX -> (fixedX[1]..fixedX[2]).map { y -> Point(fixedX[0], y) } }
-        val all = (fixedX + fixedY).toSet()
+        val all = input.flatMap { line ->
+            val numbers = line.extractInts()
+            when(line[0]) {
+                'y' -> Point.fromRange(numbers[1]..numbers[2], numbers[0])
+                'x' -> Point.fromRange(numbers[0], numbers[1]..numbers[2])
+                else -> throw IllegalStateException("Malformed input, line started with ${line[0]}")
+            }
+        }.toSet()
 
         val ground = generateWaterMap(all)
 
