@@ -65,41 +65,28 @@ class Day18(override val adventOfCode: AdventOfCode) : Day {
     }
 
     private fun List<List<LumberArea>>.getNextIteration() : List<List<LumberArea>> {
-        val newState = mutableListOf<List<LumberArea>>()
-        this.forEachIndexed { y, line ->
-            val lineList = mutableListOf<LumberArea>()
-            line.forEachIndexed { x, acre ->
+        return List(this.size) { y ->
+            List(this[y].size) { x ->
                 val surrounding = this.getSurrounding(y, x)
-
-                when (acre) {
-                    LumberArea.OPEN_GROUND -> {
-                        if (surrounding.count { sq -> sq == LumberArea.TREE } >= 3) {
+                when (this[y][x]) {
+                    LumberArea.OPEN_GROUND ->
+                        if (surrounding.count { sq -> sq == LumberArea.TREE } >= 3)
                             LumberArea.TREE
-                        } else {
+                        else
                             LumberArea.OPEN_GROUND
-                        }
-                    }
-                    LumberArea.TREE -> {
-                        if (surrounding.count { sq -> sq == LumberArea.LUMBERYARD } >= 3) {
+                    LumberArea.TREE ->
+                        if (surrounding.count { sq -> sq == LumberArea.LUMBERYARD } >= 3)
                             LumberArea.LUMBERYARD
-                        } else {
+                        else
                             LumberArea.TREE
-                        }
-                    }
-                    LumberArea.LUMBERYARD -> {
-                        if (surrounding.contains(LumberArea.LUMBERYARD) && surrounding.contains(LumberArea.TREE)) {
+                    LumberArea.LUMBERYARD ->
+                        if (surrounding.contains(LumberArea.LUMBERYARD) && surrounding.contains(LumberArea.TREE))
                             LumberArea.LUMBERYARD
-                        } else {
+                        else
                             LumberArea.OPEN_GROUND
-                        }
-                    }
-                }.let { new ->
-                    lineList.add(new)
                 }
             }
-            newState.add(lineList)
         }
-        return newState
     }
 
     override fun part1(): String {
@@ -114,21 +101,23 @@ class Day18(override val adventOfCode: AdventOfCode) : Day {
 
     override fun part2(): String {
         var curState = input
-        val previousStates : MutableList<List<List<LumberArea>>> = mutableListOf()
+        val previousStates : MutableMap<List<List<LumberArea>>, Int> = mutableMapOf()
 
         for (i in 1..1000000000) {
             val newState = curState.getNextIteration()
 
             if (newState in previousStates) {
-                val index = previousStates.indexOf(newState)
+                val index = previousStates[newState]!!
                 val cycleSize = previousStates.size - index
 
-                val finalState = previousStates[((1000000000 - i) % cycleSize) + index]
+                val finalIndex = ((1000000000 - i) % cycleSize) + index
+
+                val finalState = previousStates.filter { (_, i) -> i == finalIndex }.keys.single()
 
                 return (finalState.flatten().count { sq -> sq == LumberArea.LUMBERYARD } *  finalState.flatten().count { sq -> sq == LumberArea.TREE }).toString()
             }
 
-            previousStates.add(newState)
+            previousStates[newState] = i
 
             curState = newState
         }
