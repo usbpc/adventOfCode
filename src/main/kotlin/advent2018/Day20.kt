@@ -1,5 +1,6 @@
 package advent2018
 
+import advent2017.Day08
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
 import java.util.*
@@ -22,7 +23,6 @@ class Day20(override val adventOfCode: AdventOfCode) : Day {
     }
 
     private fun walkCharacterList(pos: Room, toWalk: String) {
-        //println(toWalk)
         var curPos = pos
         var i = 0
         loop@while(i < toWalk.length) {
@@ -30,21 +30,25 @@ class Day20(override val adventOfCode: AdventOfCode) : Day {
                 'E' -> {
                     if (curPos.east == null)
                         curPos.east = Room()
+                    curPos.east!!.west = curPos
                     curPos = curPos.east!!
                 }
                 'N' -> {
                     if (curPos.north == null)
                         curPos.north = Room()
+                    curPos.north!!.south = curPos
                     curPos = curPos.north!!
                 }
                 'S' -> {
                     if (curPos.south == null)
                         curPos.south = Room()
+                    curPos.south!!.north = curPos
                     curPos = curPos.south!!
                 }
                 'W' -> {
                     if (curPos.west == null)
                         curPos.west = Room()
+                    curPos.west!!.east = curPos
                     curPos = curPos.west!!
                 }
                 '(' -> {
@@ -55,37 +59,45 @@ class Day20(override val adventOfCode: AdventOfCode) : Day {
 
         if (i < toWalk.length) {
             val groupEnd = toWalk.findCloseBracket(--i)
-            val group = toWalk.substring(i+1..groupEnd-1)
-
-            val pipeLocations = group.findAllPipes()
 
             val ways = mutableListOf<String>()
 
-            var cur = 0
-            for (pipe in pipeLocations) {
-                ways.add(group.substring(cur until pipe))
-                cur = pipe+1
-            }
+            toWalk.substring(i+1..groupEnd-1).let { group ->
+                val pipeLocations = group.findAllPipes()
 
-            ways.add(group.substring(cur))
+
+                var cur = 0
+                for (pipe in pipeLocations) {
+                    ways.add(group.substring(cur until pipe))
+                    cur = pipe+1
+                }
+                ways.add(group.substring(cur))
+            }
 
             val rest = toWalk.substring(groupEnd+1)
-
-            for (way in ways) {
-                walkCharacterList(curPos, way + rest)
+            if (ways.any { it.isEmpty() }) {
+                for (way in ways) {
+                    walkCharacterList(curPos, way)
+                }
+                walkCharacterList(curPos, rest)
+            } else {
+                for (way in ways) {
+                    walkCharacterList(curPos, way + rest)
+                }
             }
+
         }
     }
 
     private fun String.findAllPipes() : List<Int> {
-        var openParens = 0
+        var openParents = 0
         val out = mutableListOf<Int>()
 
         for ((i, c) in this.withIndex()) {
             when(c) {
-                '(' -> openParens++
-                ')' -> openParens--
-                '|' -> if (openParens == 0) out.add(i)
+                '(' -> openParents++
+                ')' -> openParents--
+                '|' -> if (openParents == 0) out.add(i)
             }
         }
 
@@ -93,55 +105,59 @@ class Day20(override val adventOfCode: AdventOfCode) : Day {
     }
 
     private fun String.findCloseBracket(startIndex : Int = 0) : Int {
-        var openParens = 0
+        var openParents = 0
         var pos = startIndex
 
         do {
             when (this[pos++]) {
-                '(' -> openParens++
-                ')' -> openParens--
+                '(' -> openParents++
+                ')' -> openParents--
             }
-        } while (openParens > 0)
+        } while (openParents > 0)
 
         return --pos
     }
 
-    override fun part1(): String {
+    private fun getDistanceMap(input : String) : Map<Room, Int> {
         val start = Room()
 
         walkCharacterList(start, input)
 
-        val stack = Stack<Pair<Set<Room>, Room>>()
+        val stack = ArrayDeque<Pair<Set<Room>, Room>>()
 
-        stack.push(setOf<Room>() to start)
-        var max = 0
+        stack.add(setOf<Room>() to start)
+
+        val results = Day08.NeverNullMap<Room, Int> { 0 }
+
         while(stack.isNotEmpty()) {
-            val (seen, cur) = stack.pop()
+            val (seen, cur) = stack.remove()
+
+            if (cur in seen)
+                continue
+
+            results[cur] = seen.size
+
             val withThis = seen + setOf(cur)
+
             if (cur.north != null) {
-                stack.push(withThis to cur.north!!)
+                stack.add(withThis to cur.north!!)
             }
             if (cur.south != null) {
-                stack.push(withThis to cur.south!!)
+                stack.add(withThis to cur.south!!)
             }
             if (cur.east != null) {
-                stack.push(withThis to cur.east!!)
+                stack.add(withThis to cur.east!!)
             }
             if (cur.west != null) {
-                stack.push(withThis to cur.west!!)
+                stack.add(withThis to cur.west!!)
             }
-
-            if (withThis.size-1 > max)
-                max = withThis.size-1
         }
 
-        return "$max"
+        return results
     }
 
-    override fun part2(): String {
-
-        return ""
-    }
+    override fun part1(): String = getDistanceMap(input).maxBy { (_, steps) -> steps }!!.value.toString()
 
 
+    override fun part2(): String = getDistanceMap(input).count { (_, steps) -> steps >= 1000 }.toString()
 }
