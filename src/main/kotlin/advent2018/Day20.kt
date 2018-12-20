@@ -2,6 +2,7 @@ package advent2018
 
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
+import java.util.*
 
 class Day20(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 20
@@ -21,7 +22,7 @@ class Day20(override val adventOfCode: AdventOfCode) : Day {
     }
 
     private fun walkCharacterList(pos: Room, toWalk: String) {
-        println(toWalk)
+        //println(toWalk)
         var curPos = pos
         var i = 0
         loop@while(i < toWalk.length) {
@@ -108,9 +109,33 @@ class Day20(override val adventOfCode: AdventOfCode) : Day {
     override fun part1(): String {
         val start = Room()
 
-        walkCharacterList(start, "^ESSWWN(E|NNENN(EESS(WNSE|)SSS|WWWSSSSE(SW|NNNE)))\$")
+        walkCharacterList(start, input)
 
-        return ""
+        val stack = Stack<Pair<Set<Room>, Room>>()
+
+        stack.push(setOf<Room>() to start)
+        var max = 0
+        while(stack.isNotEmpty()) {
+            val (seen, cur) = stack.pop()
+            val withThis = seen + setOf(cur)
+            if (cur.north != null) {
+                stack.push(withThis to cur.north!!)
+            }
+            if (cur.south != null) {
+                stack.push(withThis to cur.south!!)
+            }
+            if (cur.east != null) {
+                stack.push(withThis to cur.east!!)
+            }
+            if (cur.west != null) {
+                stack.push(withThis to cur.west!!)
+            }
+
+            if (withThis.size-1 > max)
+                max = withThis.size-1
+        }
+
+        return "$max"
     }
 
     override fun part2(): String {
