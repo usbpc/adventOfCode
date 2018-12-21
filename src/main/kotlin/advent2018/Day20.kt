@@ -123,14 +123,14 @@ class Day20(override val adventOfCode: AdventOfCode) : Day {
 
         walkCharacterList(start, input)
 
-        val stack = ArrayDeque<Pair<Set<Room>, Room>>()
+        val queue = ArrayDeque<Pair<Set<Room>, Room>>()
 
-        stack.add(setOf<Room>() to start)
+        queue.add(setOf<Room>() to start)
 
         val results = Day08.NeverNullMap<Room, Int> { 0 }
 
-        while(stack.isNotEmpty()) {
-            val (seen, cur) = stack.remove()
+        while(queue.isNotEmpty()) {
+            val (seen, cur) = queue.remove()
 
             if (cur in seen)
                 continue
@@ -140,16 +140,16 @@ class Day20(override val adventOfCode: AdventOfCode) : Day {
             val withThis = seen + setOf(cur)
 
             if (cur.north != null) {
-                stack.add(withThis to cur.north!!)
+                queue.add(withThis to cur.north!!)
             }
             if (cur.south != null) {
-                stack.add(withThis to cur.south!!)
+                queue.add(withThis to cur.south!!)
             }
             if (cur.east != null) {
-                stack.add(withThis to cur.east!!)
+                queue.add(withThis to cur.east!!)
             }
             if (cur.west != null) {
-                stack.add(withThis to cur.west!!)
+                queue.add(withThis to cur.west!!)
             }
         }
 
