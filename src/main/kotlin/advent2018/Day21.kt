@@ -79,10 +79,11 @@ class Day21(override val adventOfCode: AdventOfCode) : Day {
         val inst = input[0].extractInts()[0]
         val registers = LongArray(6)
         val program = input.getInstructions()
+        val cmpReg = program[28].A
 
         while (true) {
             if (registers[inst] == 28L) {
-                return "${registers[5]}"
+                return "${registers[cmpReg]}"
             }
             registers.applyOperation(program[registers[inst].toInt()])
             registers[inst]++
@@ -93,15 +94,16 @@ class Day21(override val adventOfCode: AdventOfCode) : Day {
         val inst = input[0].extractInts()[0]
         val registers = LongArray(6)
         val program = input.getInstructions()
+        val cmpReg = program[28].A
         var prev = 0L
 
         val seen = mutableSetOf<Long>()
 
         while (true) {
             if (registers[inst] == 28L) {
-                if(!seen.add(registers[5]))
+                if(!seen.add(registers[cmpReg]))
                     return "$prev"
-                prev = registers[5]
+                prev = registers[cmpReg]
             }
             registers.applyOperation(program[registers[inst].toInt()])
             registers[inst]++
