@@ -3,8 +3,6 @@ package advent2018
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
 import java.lang.IllegalStateException
-import java.math.BigInteger
-import java.util.*
 
 class Day22(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 22
@@ -102,64 +100,54 @@ class Day22(override val adventOfCode: AdventOfCode) : Day {
         NARROW(listOf(Tool.NOTHING, Tool.TORCH))
     }
 
-    private data class CurrentSituation(val pos : Coord, val cost : Int, val tool : Tool)
+    private data class CurrentSituation(val pos : Coord, val tool : Tool)
     private data class CurrentSituationWH(val pos : Coord, val cost : Int, val tool : Tool, val history : List<CurrentSituation>) {
-        fun withoutHistory() = CurrentSituation(pos, cost, tool)
+        //fun withoutHistory() = CurrentSituation(pos, cost, tool)
     }
 
     override fun part2(): String {
-        val depth = 510 //input[0][0]
-        val target = Coord(10, 10)//Coord(input[1][0], input[1][1])
+        val depth = input[0][0]
+        val target = Coord(input[1][0], input[1][1])
 
-        val queue = ArrayDeque<CurrentSituation>()
-        val seen = mutableMapOf<Pair<Coord, Tool>, Int>()
+        val targetSit = CurrentSituation(target, Tool.TORCH)
 
-        queue.add(CurrentSituation(Coord(0, 0), 0, Tool.TORCH))
-        var minCost = Int.MAX_VALUE
+        val visited = mutableMapOf<CurrentSituation, Int>()
+        val toVisit = mutableMapOf(CurrentSituation(Coord(0,0), Tool.TORCH) to 0)
 
         val erosionMap = mutableMapOf<Coord, Long>()
 
-        loop@while (queue.isNotEmpty()) {
-            val cur = queue.poll()
-            if (cur.cost >= minCost)
-                continue
+        while (targetSit !in visited) {
+            val (curSit, distance) = toVisit.minBy { it.value }!!
+            val curRegionType = curSit.pos.regionType(depth, target, erosionMap)
 
-            if (cur.pos == target) {
-                if (cur.tool == Tool.TORCH) {
-                    if (cur.cost < minCost) {
-                        minCost = cur.cost
-                    }
-                } else {
-                    if (cur.cost + 7 < minCost) {
-                        minCost = cur.cost + 7
-                    }
+            CurrentSituation(curSit.pos, curRegionType.validTools.single { it != curSit.tool }).let { newSit ->
+                if (newSit !in visited) {
+                    val curDis = toVisit[newSit] ?: Int.MAX_VALUE
+                    if (distance + 7 < curDis)
+                        toVisit[newSit] = distance + 7
                 }
-                continue
-            }
-            val key = (cur.pos to cur.tool)
-
-            if ( key in seen) {
-                if (cur.cost > seen[key]!!)
-                    continue
-                if (seen[key]!! > cur.cost)
-                    seen[key] = cur.cost
-            } else {
-                seen[key] = cur.cost
             }
 
-
-            cur.pos.adjecent()
+            curSit.pos.adjecent()
                     .filter(Coord::isValid)
                     .forEach { adj ->
-                        val regionType = adj.regionType(depth, target, erosionMap)
-                        if (cur.tool in regionType.validTools) {
-                            queue.add(CurrentSituation(adj, cur.cost + 1, cur.tool))
-                        } else {
-                            queue.add(CurrentSituation(adj, cur.cost + 1 + 7, cur.pos.regionType(depth, target, erosionMap).validTools.intersect(regionType.validTools).single()))
+                        val adjRegionType = adj.regionType(depth, target, erosionMap)
+
+                        if (curSit.tool in adjRegionType.validTools) {
+                            CurrentSituation(adj, curSit.tool).let { newSit ->
+                                if (newSit !in visited) {
+                                    val curDis = toVisit[newSit] ?: Int.MAX_VALUE
+                                    if (distance + 1 < curDis)
+                                        toVisit[newSit] = distance + 1
+                                }
+                            }
                         }
                     }
+
+            toVisit.remove(curSit)
+            visited[curSit] = distance
         }
 
-        return "" + minCost
+        return visited[targetSit].toString()
     }
 }
