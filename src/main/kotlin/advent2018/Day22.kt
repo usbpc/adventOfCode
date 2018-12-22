@@ -3,6 +3,7 @@ package advent2018
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
 import java.lang.IllegalStateException
+import kotlin.math.abs
 
 class Day22(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 22
@@ -19,6 +20,8 @@ class Day22(override val adventOfCode: AdventOfCode) : Day {
                 left(),
                 right()
         )
+
+        fun distanceTo(other: Coord) = abs(y - other.y) + abs(x - other.x)
 
         fun isValid() = this.x >= 0 && this.y >= 0
     }
@@ -117,14 +120,14 @@ class Day22(override val adventOfCode: AdventOfCode) : Day {
         val erosionMap = mutableMapOf<Coord, Long>()
 
         while (targetSit !in visited) {
-            val (curSit, distance) = toVisit.minBy { it.value }!!
+            val (curSit, distance) = toVisit.minBy { it.value + it.key.pos.distanceTo(target) }!!
             val curRegionType = curSit.pos.regionType(depth, target, erosionMap)
 
             CurrentSituation(curSit.pos, curRegionType.validTools.single { it != curSit.tool }).let { newSit ->
                 if (newSit !in visited) {
-                    val curDis = toVisit[newSit] ?: Int.MAX_VALUE
-                    if (distance + 7 < curDis)
-                        toVisit[newSit] = distance + 7
+                    //val curDis = toVisit[newSit] ?: Int.MAX_VALUE
+                    //if (distance + 7 < curDis)
+                    toVisit[newSit] = distance + 7
                 }
             }
 
@@ -136,9 +139,9 @@ class Day22(override val adventOfCode: AdventOfCode) : Day {
                         if (curSit.tool in adjRegionType.validTools) {
                             CurrentSituation(adj, curSit.tool).let { newSit ->
                                 if (newSit !in visited) {
-                                    val curDis = toVisit[newSit] ?: Int.MAX_VALUE
-                                    if (distance + 1 < curDis)
-                                        toVisit[newSit] = distance + 1
+                                    //val curDis = toVisit[newSit] ?: Int.MAX_VALUE
+                                    //if (distance + 1 < curDis)
+                                    toVisit[newSit] = distance + 1
                                 }
                             }
                         }
