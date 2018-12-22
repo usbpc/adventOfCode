@@ -1,5 +1,6 @@
 package advent2018
 
+import org.omg.CORBA.Current
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
 import java.lang.IllegalStateException
@@ -106,40 +107,47 @@ class Day22(override val adventOfCode: AdventOfCode) : Day {
     }
 
     private data class CurrentSituation(val pos : Coord, val cost : Int, val tool : Tool)
+    private data class CurrentSituationWH(val pos : Coord, val cost : Int, val tool : Tool, val history : List<CurrentSituation>) {
+        fun withoutHistory() = CurrentSituation(pos, cost, tool)
+    }
 
     override fun part2(): String {
-        val depth = 510//input[0][0]
-        val target = Coord(10, 10)//Coord(input[1][0], input[1][1])
+        val depth = input[0][0]
+        val target = Coord(input[1][0], input[1][1])
 
         val queue = ArrayDeque<CurrentSituation>()
-        val seen = mutableMapOf<Coord, Int>()
+        val seen = mutableMapOf<Pair<Coord, Tool>, Int>()
 
         queue.add(CurrentSituation(Coord(0, 0), 0, Tool.TORCH))
         var minCost = Int.MAX_VALUE
-        while (queue.isNotEmpty()) {
+        loop@while (queue.isNotEmpty()) {
             val cur = queue.poll()
             if (cur.cost >= minCost)
                 continue
 
             if (cur.pos == target) {
                 if (cur.tool == Tool.TORCH) {
-                    if (cur.cost < minCost)
+                    if (cur.cost < minCost) {
                         minCost = cur.cost
+                    }
                 } else {
-                    if (cur.cost + 7 < minCost)
+                    if (cur.cost + 7 < minCost) {
                         minCost = cur.cost + 7
+                    }
                 }
                 continue
             }
+            val key = (cur.pos to cur.tool)
 
-            if (cur.pos in seen) {
-                if (cur.cost > seen[cur.pos]!!)
+            if ( key in seen) {
+                if (cur.cost > seen[key]!!)
                     continue
-                if (seen[cur.pos]!! > cur.cost)
-                    seen[cur.pos] = cur.cost
+                if (seen[key]!! > cur.cost)
+                    seen[key] = cur.cost
             } else {
-                seen[cur.pos] = cur.cost
+                seen[key] = cur.cost
             }
+
 
             cur.pos.adjecent()
                     .filter(Coord::isValid)
@@ -152,7 +160,7 @@ class Day22(override val adventOfCode: AdventOfCode) : Day {
                         }
                     }
         }
-
+        println(Coord(x=1, y=5).regionType(depth, target))
         return "" + minCost
     }
 }
