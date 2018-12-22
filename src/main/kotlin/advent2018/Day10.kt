@@ -88,7 +88,11 @@ class Day10(override val adventOfCode: AdventOfCode) : Day {
         }
 
         inputCopy.forEach { it.first.sub(it.second) }
-        return  "" + printGrid(inputCopy).splitLettersToList().map { bigToSmall[it] }.requireNoNulls().fold(StringBuilder()) { acc, c -> acc.append(c) }
+        return  "" + printGrid(inputCopy)
+                .splitLettersToList()
+                .map { bigToSmall[it] }
+                .requireNoNulls()
+                .fold(StringBuilder()) { acc, c -> acc.append(c) }
     }
 
     override fun part2(): String {
