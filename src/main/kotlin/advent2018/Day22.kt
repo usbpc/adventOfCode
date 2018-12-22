@@ -3,6 +3,8 @@ package advent2018
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
 import java.lang.IllegalStateException
+import java.util.*
+import kotlin.Comparator
 import kotlin.math.abs
 
 class Day22(override val adventOfCode: AdventOfCode) : Day {
@@ -108,6 +110,8 @@ class Day22(override val adventOfCode: AdventOfCode) : Day {
         //fun withoutHistory() = CurrentSituation(pos, cost, tool)
     }
 
+    private data class QueueData(val curSit: CurrentSituation, val distance: Int)
+
     override fun part2(): String {
         val depth = input[0][0]
         val target = Coord(input[1][0], input[1][1])
@@ -115,19 +119,26 @@ class Day22(override val adventOfCode: AdventOfCode) : Day {
         val targetSit = CurrentSituation(target, Tool.TORCH)
 
         val visited = mutableMapOf<CurrentSituation, Int>()
-        val toVisit = mutableMapOf(CurrentSituation(Coord(0,0), Tool.TORCH) to 0)
+        val toVisit = PriorityQueue<QueueData>(100, Comparator<QueueData> { first, second ->
+            (first.distance + first.curSit.pos.distanceTo(target)) - (second.distance + second.curSit.pos.distanceTo(target))
+        })
+
+        toVisit.add(QueueData(CurrentSituation(Coord(0, 0), Tool.TORCH), 0))
+
 
         val erosionMap = mutableMapOf<Coord, Long>()
 
         while (targetSit !in visited) {
-            val (curSit, distance) = toVisit.minBy { it.value + it.key.pos.distanceTo(target) }!!
+            val (curSit, distance) = toVisit.poll()
+            visited[curSit] = distance
+
             val curRegionType = curSit.pos.regionType(depth, target, erosionMap)
 
             CurrentSituation(curSit.pos, curRegionType.validTools.single { it != curSit.tool }).let { newSit ->
                 if (newSit !in visited) {
                     //val curDis = toVisit[newSit] ?: Int.MAX_VALUE
                     //if (distance + 7 < curDis)
-                    toVisit[newSit] = distance + 7
+                    toVisit.add(QueueData(newSit, distance + 7))
                 }
             }
 
@@ -141,14 +152,13 @@ class Day22(override val adventOfCode: AdventOfCode) : Day {
                                 if (newSit !in visited) {
                                     //val curDis = toVisit[newSit] ?: Int.MAX_VALUE
                                     //if (distance + 1 < curDis)
-                                    toVisit[newSit] = distance + 1
+                                    toVisit.add(QueueData(newSit, distance + 1))
                                 }
                             }
                         }
                     }
 
-            toVisit.remove(curSit)
-            visited[curSit] = distance
+
         }
 
         return visited[targetSit].toString()
