@@ -118,8 +118,8 @@ class Day22(override val adventOfCode: AdventOfCode) : Day {
 
         val targetSit = CurrentSituation(target, Tool.TORCH)
 
-        val visited = mutableMapOf<CurrentSituation, Int>()
-        val toVisit = PriorityQueue<QueueData>(100, Comparator<QueueData> { first, second ->
+        val visited = mutableSetOf<CurrentSituation>()
+        val toVisit = PriorityQueue<QueueData>(11, Comparator<QueueData> { first, second ->
             (first.distance + first.curSit.pos.distanceTo(target)) - (second.distance + second.curSit.pos.distanceTo(target))
         })
 
@@ -128,18 +128,18 @@ class Day22(override val adventOfCode: AdventOfCode) : Day {
 
         val erosionMap = mutableMapOf<Coord, Long>()
 
-        while (targetSit !in visited) {
+        while (true) {
             val (curSit, distance) = toVisit.poll()
-            visited[curSit] = distance
+            if (curSit in visited)
+                continue
+            if (curSit == targetSit)
+                return distance.toString()
+            visited.add(curSit)
 
             val curRegionType = curSit.pos.regionType(depth, target, erosionMap)
 
             CurrentSituation(curSit.pos, curRegionType.validTools.single { it != curSit.tool }).let { newSit ->
-                if (newSit !in visited) {
-                    //val curDis = toVisit[newSit] ?: Int.MAX_VALUE
-                    //if (distance + 7 < curDis)
-                    toVisit.add(QueueData(newSit, distance + 7))
-                }
+                toVisit.add(QueueData(newSit, distance + 7))
             }
 
             curSit.pos.adjecent()
@@ -149,18 +149,12 @@ class Day22(override val adventOfCode: AdventOfCode) : Day {
 
                         if (curSit.tool in adjRegionType.validTools) {
                             CurrentSituation(adj, curSit.tool).let { newSit ->
-                                if (newSit !in visited) {
-                                    //val curDis = toVisit[newSit] ?: Int.MAX_VALUE
-                                    //if (distance + 1 < curDis)
-                                    toVisit.add(QueueData(newSit, distance + 1))
-                                }
+                                toVisit.add(QueueData(newSit, distance + 1))
                             }
                         }
                     }
 
 
         }
-
-        return visited[targetSit].toString()
     }
 }
