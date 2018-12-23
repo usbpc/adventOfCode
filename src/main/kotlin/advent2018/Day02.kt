@@ -10,7 +10,6 @@ class Day02(override val adventOfCode: AdventOfCode) : Day {
 
     override fun part1(): String {
         val charCounts = input.map { line -> line.groupBy { it }.map { it.value.size } }
-        mapOf<Int, Int>().mapValues {  }
         return "" + charCounts.count{ 2 in it } * charCounts.count { 3 in it }
     }
 
