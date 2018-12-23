@@ -62,46 +62,45 @@ class Day23(override val adventOfCode: AdventOfCode) : Day {
         return out
     }
 
-    private fun Day08.NeverNullMap<Point, Int>.walkFromOrigin(p: Point, maxDistance: Int) {
+    private fun walkFromOrigin(cur: Point, maxDistance: Int, action: (Point) -> Unit) {
+        
+        action(cur)
 
-            val cur = p
-            this[cur]++
+        walkStartingLine(cur, Point(0, 1, 0), maxDistance, action)
+        walkStartingLine(cur, Point(0, -1, 0), maxDistance, action)
 
-            this.walkStartingLine(cur, Point(0, 1, 0), maxDistance)
-            this.walkStartingLine(cur, Point(0, -1, 0), maxDistance)
+        walkMediumLine(cur, Point(0, 0, 1), maxDistance, action)
+        walkMediumLine(cur, Point(0, 0, -1), maxDistance, action)
 
-            this.walkMediumLine(cur, Point(0, 0, 1), maxDistance)
-            this.walkMediumLine(cur, Point(0, 0, -1), maxDistance)
-
-            this.walkFinalLine(cur, Point(1, 0, 0), maxDistance)
-            this.walkFinalLine(cur, Point(-1, 0, 0), maxDistance)
+        walkFinalLine(cur, Point(1, 0, 0), maxDistance, action)
+        walkFinalLine(cur, Point(-1, 0, 0), maxDistance, action)
     }
 
-    private fun Day08.NeverNullMap<Point, Int>.walkStartingLine(p: Point, dir: Point, maxDistance: Int) {
+    private fun walkStartingLine(p: Point, dir: Point, maxDistance: Int, action: (Point) -> Unit) {
         for (dis in 1..maxDistance) {
             val cur = p + dir * dis
-            this[cur]++
-            this.walkMediumLine(cur, Point(0, 0, 1), maxDistance-dis)
-            this.walkMediumLine(cur, Point(0, 0, -1), maxDistance-dis)
+            action(cur)
+            walkMediumLine(cur, Point(0, 0, 1), maxDistance-dis, action)
+            walkMediumLine(cur, Point(0, 0, -1), maxDistance-dis, action)
 
-            this.walkFinalLine(cur, Point(1, 0, 0), maxDistance-dis)
-            this.walkFinalLine(cur, Point(-1, 0, 0), maxDistance-dis)
+            walkFinalLine(cur, Point(1, 0, 0), maxDistance-dis, action)
+            walkFinalLine(cur, Point(-1, 0, 0), maxDistance-dis, action)
         }
     }
 
-    private fun Day08.NeverNullMap<Point, Int>.walkMediumLine(p: Point, dir: Point, maxDistance: Int) {
+    private fun walkMediumLine(p: Point, dir: Point, maxDistance: Int, action: (Point) -> Unit) {
         for (dis in 1..maxDistance) {
             val cur = p + dir * dis
-            this[cur]++
-            this.walkFinalLine(cur, Point(1, 0, 0), maxDistance-dis)
-            this.walkFinalLine(cur, Point(-1, 0, 0), maxDistance-dis)
+            action(cur)
+            walkFinalLine(cur, Point(1, 0, 0), maxDistance-dis, action)
+            walkFinalLine(cur, Point(-1, 0, 0), maxDistance-dis, action)
         }
     }
 
-    private fun Day08.NeverNullMap<Point, Int>.walkFinalLine(p: Point, dir: Point, maxDistance: Int) {
+    private fun walkFinalLine(p: Point, dir: Point, maxDistance: Int, action: (Point) -> Unit) {
         for (dis in 1..maxDistance) {
             val cur = p + dir * dis
-            this[cur]++
+            action(cur)
         }
     }
 
@@ -109,13 +108,16 @@ class Day23(override val adventOfCode: AdventOfCode) : Day {
 
         val origin = Point(0,0,0)
 
-        val pointMap = Day08.NeverNullMap<Point, Int> {0}
+        val pointMap = mutableMapOf<Point, Int>()
 
         for (nanobot in input) {
             val point = nanobot.asPoint()
-            pointMap.walkFromOrigin(point, nanobot.range.toInt())
+            walkFromOrigin(point, nanobot.range.toInt()) { curP ->
+                if (input.filter { it !== nanobot }.any { it.distanceTo(curP) <= it.range })
+                    pointMap[curP] = 0
+            }
         }
-
+        println("We got this far!")
         val maxInRange = pointMap.maxBy { it.value }!!.value
 
         val out = pointMap.filterValues { it == maxInRange }.minBy { it.key.distanceTo(origin) }!!.key.distanceTo(origin)
