@@ -1,5 +1,6 @@
 package advent2018
 
+import advent2017.Day08
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
 import java.util.*
@@ -17,26 +18,26 @@ class Day23(override val adventOfCode: AdventOfCode) : Day {
                 abs(this.x - other.x) + abs(this.y - other.y) + abs(this.z - other.z)
         fun distanceTo(other: Point) =
                 abs(this.x - other.x) + abs(this.y - other.y) + abs(this.z - other.z)
+        fun asPoint() = Point(x, y, z)
     }
-    private data class Point(val x: Long, val y: Long, val z: Long, val prev : Point? = null) {
+    private data class Point(val x: Long, val y: Long, val z: Long) {
         fun distanceTo(other: Point) =
                 abs(this.x - other.x) + abs(this.y - other.y) + abs(this.z - other.z)
         fun withoutPrev() = Point(x, y, z)
         fun adjacent() =
                 listOf(
-                        Point(x-1, y, z, withoutPrev()),
-                        Point(x+1, y, z, withoutPrev()),
-                        Point(x, y-1, z, withoutPrev()),
-                        Point(x, y+1, z, withoutPrev()),
-                        Point(x, y, z-1, withoutPrev()),
-                        Point(x, y, z+1, withoutPrev())
+                        Point(x-1, y, z),
+                        Point(x+1, y, z),
+                        Point(x, y-1, z),
+                        Point(x, y+1, z),
+                        Point(x, y, z-1),
+                        Point(x, y, z+1)
                 )
+        operator fun plus(other: Point) : Point =
+                Point(x+other.x, y+other.y, z+other.z)
 
-        override fun equals(other: Any?): Boolean {
-            if (other !is Point)
-                return false
-            return other.x == x && other.y == y && other.z == z
-        }
+        operator fun times(other: Int) : Point =
+                Point(x*other, x*other, z*other)
     }
 
     override fun part1(): String {
@@ -61,58 +62,62 @@ class Day23(override val adventOfCode: AdventOfCode) : Day {
         return out
     }
 
+    private fun Day08.NeverNullMap<Point, Int>.walkFromOrigin(p: Point, maxDistance: Int) {
+
+            val cur = p
+            this[cur]++
+
+            this.walkStartingLine(cur, Point(0, 1, 0), maxDistance)
+            this.walkStartingLine(cur, Point(0, -1, 0), maxDistance)
+
+            this.walkMediumLine(cur, Point(0, 0, 1), maxDistance)
+            this.walkMediumLine(cur, Point(0, 0, -1), maxDistance)
+
+            this.walkFinalLine(cur, Point(1, 0, 0), maxDistance)
+            this.walkFinalLine(cur, Point(-1, 0, 0), maxDistance)
+    }
+
+    private fun Day08.NeverNullMap<Point, Int>.walkStartingLine(p: Point, dir: Point, maxDistance: Int) {
+        for (dis in 1..maxDistance) {
+            val cur = p + dir * dis
+            this[cur]++
+            this.walkMediumLine(cur, Point(0, 0, 1), maxDistance-dis)
+            this.walkMediumLine(cur, Point(0, 0, -1), maxDistance-dis)
+
+            this.walkFinalLine(cur, Point(1, 0, 0), maxDistance-dis)
+            this.walkFinalLine(cur, Point(-1, 0, 0), maxDistance-dis)
+        }
+    }
+
+    private fun Day08.NeverNullMap<Point, Int>.walkMediumLine(p: Point, dir: Point, maxDistance: Int) {
+        for (dis in 1..maxDistance) {
+            val cur = p + dir * dis
+            this[cur]++
+            this.walkFinalLine(cur, Point(1, 0, 0), maxDistance-dis)
+            this.walkFinalLine(cur, Point(-1, 0, 0), maxDistance-dis)
+        }
+    }
+
+    private fun Day08.NeverNullMap<Point, Int>.walkFinalLine(p: Point, dir: Point, maxDistance: Int) {
+        for (dis in 1..maxDistance) {
+            val cur = p + dir * dis
+            this[cur]++
+        }
+    }
+
     override fun part2(): String {
-        val minX = input.minBy { it.x }!!.x
-        val maxX = input.maxBy { it.x }!!.x
-
-        val minY = input.minBy { it.y }!!.y
-        val maxY = input.maxBy { it.y }!!.y
-
-        val minZ = input.minBy { it.z }!!.z
-        val maxZ = input.maxBy { it.z }!!.z
 
         val origin = Point(0,0,0)
 
-        var maxInRange = Long.MIN_VALUE
-        var minToOrigin = Long.MAX_VALUE
-
+        val pointMap = Day08.NeverNullMap<Point, Int> {0}
 
         for (nanobot in input) {
-            var localMax = 0L
-            var localMinDistance = Long.MAX_VALUE
-
-
-            val toCheck = ArrayDeque<Point>()
-            toCheck.add(Point(nanobot.x, nanobot.y, nanobot.z))
-
-            while (toCheck.isNotEmpty()) {
-                val curPos = toCheck.poll()
-                val inRange = curPos.nanobotsInRange(input).toLong()
-                if (inRange < localMax)
-                    continue
-                if (inRange == localMax) {
-                    if (curPos.distanceTo(origin) < localMinDistance) {
-                        localMinDistance = curPos.distanceTo(origin)
-                    }
-                } else {
-                    localMax = inRange
-                    localMinDistance = curPos.distanceTo(origin)
-                }
-
-                curPos.adjacent()
-                        .filter { it != curPos.prev }
-                        .filter { it !in toCheck }
-                        .forEach { toCheck.add(it) }
-            }
-
-            if (localMax >= maxInRange) {
-                if (localMax != maxInRange || localMinDistance < minToOrigin) {
-                    maxInRange = localMax
-                    minToOrigin = localMinDistance
-                }
-            }
+            val point = nanobot.asPoint()
+            pointMap.walkFromOrigin(point, nanobot.range.toInt())
         }
 
-        return "" + minToOrigin
+        println(pointMap.maxBy { it.value })
+
+        return ""
     }
 }
