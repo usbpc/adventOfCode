@@ -116,8 +116,11 @@ class Day23(override val adventOfCode: AdventOfCode) : Day {
                 if (input.filter { it !== nanobot }.any { it.distanceTo(curP) <= it.range })
                     pointMap[curP] = 0
             }
+            println("One more nanobot done, points found so far: ${pointMap.size}")
         }
+        
         println("We got this far!")
+
         val maxInRange = pointMap.maxBy { it.value }!!.value
 
         val out = pointMap.filterValues { it == maxInRange }.minBy { it.key.distanceTo(origin) }!!.key.distanceTo(origin)
