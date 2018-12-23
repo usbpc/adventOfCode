@@ -116,8 +116,10 @@ class Day23(override val adventOfCode: AdventOfCode) : Day {
             pointMap.walkFromOrigin(point, nanobot.range.toInt())
         }
 
-        println(pointMap.maxBy { it.value })
+        val maxInRange = pointMap.maxBy { it.value }!!.value
 
-        return ""
+        val out = pointMap.filterValues { it == maxInRange }.minBy { it.key.distanceTo(origin) }!!.key.distanceTo(origin)
+
+        return "" + out
     }
 }
