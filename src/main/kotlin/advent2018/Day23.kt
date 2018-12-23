@@ -2,6 +2,7 @@ package advent2018
 
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
+import java.util.*
 import kotlin.math.abs
 import kotlin.math.min
 
@@ -20,6 +21,15 @@ class Day23(override val adventOfCode: AdventOfCode) : Day {
     private data class Point(val x: Long, val y: Long, val z: Long) {
         fun distanceTo(other: Point) =
                 abs(this.x - other.x) + abs(this.y - other.y) + abs(this.z - other.z)
+        fun adjacent() =
+                listOf(
+                        Point(x-1, y, z),
+                        Point(x+1, y, z),
+                        Point(x, y-1, z),
+                        Point(x, y+1, z),
+                        Point(x, y, z-1),
+                        Point(x, y, z+1)
+                )
     }
 
     override fun part1(): String {
@@ -35,6 +45,14 @@ class Day23(override val adventOfCode: AdventOfCode) : Day {
         return "" + out
     }
 
+    private fun Point.nanobotsInRange(nanobots: List<NanoBot>) : Int {
+        var out = 0
+        for (nanobot in nanobots) {
+            if (nanobot.distanceTo(this) <= nanobot.range)
+                out++
+        }
+        return out
+    }
 
     override fun part2(): String {
         val minX = input.minBy { it.x }!!.x
@@ -51,26 +69,35 @@ class Day23(override val adventOfCode: AdventOfCode) : Day {
         var maxInRange = Long.MIN_VALUE
         var minToOrigin = Long.MAX_VALUE
 
-        for (x in minX..maxX) {
-            for (y in minY..maxY) {
-                for (z in minZ..maxZ) {
-                    val curPos = Point(x, y, z)
 
-                    var inRange = 0L
+        for (nanobot in input) {
+            var localMax = 0L
+            var localMinDistance = Long.MAX_VALUE
 
-                    for (nanobot in input) {
-                        if (nanobot.distanceTo(curPos) <= nanobot.range) {
-                            inRange++
-                        }
+            var curPos = Point(nanobot.x, nanobot.y, nanobot.z)
+            val toCheck = ArrayDeque<Point>()
+            toCheck.add(curPos)
+
+            while (toCheck.isNotEmpty()) {
+                curPos = toCheck.poll()
+                val inRange = curPos.nanobotsInRange(input).toLong()
+                if (inRange < localMax)
+                    continue
+                if (inRange == localMax) {
+                    if (curPos.distanceTo(origin) < localMinDistance) {
+                        localMinDistance = curPos.distanceTo(origin)
                     }
+                } else {
+                    localMax = inRange
+                    localMinDistance = curPos.distanceTo(origin)
+                }
+                curPos.adjacent().forEach { toCheck.add(it) }
+            }
 
-                    if (inRange >= maxInRange) {
-                        if (curPos.distanceTo(origin) < minToOrigin) {
-                            minToOrigin = curPos.distanceTo(origin)
-                            maxInRange = inRange
-                        }
-                    }
-
+            if (localMax >= maxInRange) {
+                if (localMax != maxInRange || localMinDistance < minToOrigin) {
+                    maxInRange = localMax
+                    minToOrigin = localMinDistance
                 }
             }
         }
