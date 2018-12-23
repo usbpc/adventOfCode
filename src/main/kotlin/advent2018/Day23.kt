@@ -1,9 +1,7 @@
 package advent2018
 
-import advent2017.Day08
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
-import java.util.*
 import kotlin.math.abs
 import kotlin.math.min
 
@@ -24,6 +22,7 @@ class Day23(override val adventOfCode: AdventOfCode) : Day {
         fun distanceTo(other: Point) =
                 abs(this.x - other.x) + abs(this.y - other.y) + abs(this.z - other.z)
         fun withoutPrev() = Point(x, y, z)
+
         fun adjacent() =
                 listOf(
                         Point(x-1, y, z),
@@ -33,11 +32,15 @@ class Day23(override val adventOfCode: AdventOfCode) : Day {
                         Point(x, y, z-1),
                         Point(x, y, z+1)
                 )
+
         operator fun plus(other: Point) : Point =
                 Point(x+other.x, y+other.y, z+other.z)
 
-        operator fun times(other: Int) : Point =
-                Point(x*other, x*other, z*other)
+        operator fun times(other: Long) : Point =
+                Point(x*other, y*other, z*other)
+
+        operator fun div(other: Long) : Point =
+                Point(x/other, y/other, z/other)
     }
 
     override fun part1(): String {
@@ -62,44 +65,53 @@ class Day23(override val adventOfCode: AdventOfCode) : Day {
         return out
     }
 
-    private fun walkFromOrigin(cur: Point, maxDistance: Int, action: (Point) -> Unit) {
+    private fun walkFromOrigin(cur: Point, asLong: (Point) -> Boolean, action: (Point) -> Unit) {
         
         action(cur)
 
-        walkStartingLine(cur, Point(0, 1, 0), maxDistance, action)
-        walkStartingLine(cur, Point(0, -1, 0), maxDistance, action)
+        walkStartingLine(cur, Point(0, 1, 0), asLong, action)
+        walkStartingLine(cur, Point(0, -1, 0), asLong, action)
 
-        walkMediumLine(cur, Point(0, 0, 1), maxDistance, action)
-        walkMediumLine(cur, Point(0, 0, -1), maxDistance, action)
+        walkMediumLine(cur, Point(0, 0, 1), asLong, action)
+        walkMediumLine(cur, Point(0, 0, -1), asLong, action)
 
-        walkFinalLine(cur, Point(1, 0, 0), maxDistance, action)
-        walkFinalLine(cur, Point(-1, 0, 0), maxDistance, action)
+        walkFinalLine(cur, Point(1, 0, 0), asLong, action)
+        walkFinalLine(cur, Point(-1, 0, 0), asLong, action)
     }
 
-    private fun walkStartingLine(p: Point, dir: Point, maxDistance: Int, action: (Point) -> Unit) {
-        for (dis in 1..maxDistance) {
-            val cur = p + dir * dis
+    private fun walkStartingLine(p: Point, dir: Point, asLong: (Point) -> Boolean, action: (Point) -> Unit) {
+        var dis = 1L
+        while (true) {
+            val cur = p + dir * dis++
+            if (!asLong(cur))
+                break
             action(cur)
-            walkMediumLine(cur, Point(0, 0, 1), maxDistance-dis, action)
-            walkMediumLine(cur, Point(0, 0, -1), maxDistance-dis, action)
+            walkMediumLine(cur, Point(0, 0, 1), asLong, action)
+            walkMediumLine(cur, Point(0, 0, -1), asLong, action)
 
-            walkFinalLine(cur, Point(1, 0, 0), maxDistance-dis, action)
-            walkFinalLine(cur, Point(-1, 0, 0), maxDistance-dis, action)
+            walkFinalLine(cur, Point(1, 0, 0), asLong, action)
+            walkFinalLine(cur, Point(-1, 0, 0), asLong, action)
         }
     }
 
-    private fun walkMediumLine(p: Point, dir: Point, maxDistance: Int, action: (Point) -> Unit) {
-        for (dis in 1..maxDistance) {
-            val cur = p + dir * dis
+    private fun walkMediumLine(p: Point, dir: Point, asLong: (Point) -> Boolean, action: (Point) -> Unit) {
+        var dis = 0L
+        while (true) {
+            val cur = p + dir * dis++
+            if (!asLong(cur))
+                break
             action(cur)
-            walkFinalLine(cur, Point(1, 0, 0), maxDistance-dis, action)
-            walkFinalLine(cur, Point(-1, 0, 0), maxDistance-dis, action)
+            walkFinalLine(cur, Point(1, 0, 0), asLong, action)
+            walkFinalLine(cur, Point(-1, 0, 0), asLong, action)
         }
     }
 
-    private fun walkFinalLine(p: Point, dir: Point, maxDistance: Int, action: (Point) -> Unit) {
-        for (dis in 1..maxDistance) {
-            val cur = p + dir * dis
+    private fun walkFinalLine(p: Point, dir: Point, asLong: (Point) -> Boolean, action: (Point) -> Unit) {
+        var dis = 0L
+        while (true) {
+            val cur = p + dir * dis++
+            if (!asLong(cur))
+                break
             action(cur)
         }
     }
@@ -110,21 +122,45 @@ class Day23(override val adventOfCode: AdventOfCode) : Day {
 
         val pointMap = mutableMapOf<Point, Int>()
 
+        val twoMeet = mutableSetOf<Pair<Point, List<NanoBot>>>()
+
         for (nanobot in input) {
             val point = nanobot.asPoint()
-            walkFromOrigin(point, nanobot.range.toInt()) { curP ->
-                if (input.filter { it !== nanobot }.any { it.distanceTo(curP) <= it.range })
-                    pointMap[curP] = 0
+            for (other in input.dropWhile { it != nanobot }.drop(1)) {
+                val otherP = other.asPoint()
+
+                if (point.distanceTo(otherP) <= other.range + nanobot.range) {
+                    val middle = (point * other.range + otherP * nanobot.range) / (other.range + nanobot.range)
+
+                    val toCheck = mutableSetOf(middle)
+
+                    middle.adjacent().flatMap { it.adjacent() }.flatMap { it.adjacent() }.forEach { toCheck.add(it) }
+
+                    val checked = toCheck.firstOrNull { it.distanceTo(point) <= nanobot.range && it.distanceTo(otherP) <= other.range }
+                    if (checked != null) {
+                        twoMeet.add(checked to listOf(nanobot, other))
+                    } else {
+                        println(":(")
+                    }
+                }
+
             }
-            println("One more nanobot done, points found so far: ${pointMap.size}")
         }
         
-        println("We got this far!")
+        val (point, bots) = twoMeet.first()
+        val tmpSet = mutableSetOf<Point>()
 
-        val maxInRange = pointMap.maxBy { it.value }!!.value
+        walkFromOrigin(point, { p -> bots.all { b -> b.distanceTo(p) <= b.range }} ) { p -> tmpSet.add(p) }
 
-        val out = pointMap.filterValues { it == maxInRange }.minBy { it.key.distanceTo(origin) }!!.key.distanceTo(origin)
+        println("We got this far! We found: ${twoMeet.size}")
+        println("We got this far! We found: ${tmpSet.size}")
 
-        return "" + out
+        //println("These are all we got: $twoMeet")
+
+        //val maxInRange = pointMap.maxBy { it.value }!!.value
+
+        //val out = pointMap.filterValues { it == maxInRange }.minBy { it.key.distanceTo(origin) }!!.key.distanceTo(origin)
+
+        return ""
     }
 }
