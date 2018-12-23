@@ -18,18 +18,25 @@ class Day23(override val adventOfCode: AdventOfCode) : Day {
         fun distanceTo(other: Point) =
                 abs(this.x - other.x) + abs(this.y - other.y) + abs(this.z - other.z)
     }
-    private data class Point(val x: Long, val y: Long, val z: Long) {
+    private data class Point(val x: Long, val y: Long, val z: Long, val prev : Point? = null) {
         fun distanceTo(other: Point) =
                 abs(this.x - other.x) + abs(this.y - other.y) + abs(this.z - other.z)
+        fun withoutPrev() = Point(x, y, z)
         fun adjacent() =
                 listOf(
-                        Point(x-1, y, z),
-                        Point(x+1, y, z),
-                        Point(x, y-1, z),
-                        Point(x, y+1, z),
-                        Point(x, y, z-1),
-                        Point(x, y, z+1)
+                        Point(x-1, y, z, withoutPrev()),
+                        Point(x+1, y, z, withoutPrev()),
+                        Point(x, y-1, z, withoutPrev()),
+                        Point(x, y+1, z, withoutPrev()),
+                        Point(x, y, z-1, withoutPrev()),
+                        Point(x, y, z+1, withoutPrev())
                 )
+
+        override fun equals(other: Any?): Boolean {
+            if (other !is Point)
+                return false
+            return other.x == x && other.y == y && other.z == z
+        }
     }
 
     override fun part1(): String {
@@ -74,12 +81,12 @@ class Day23(override val adventOfCode: AdventOfCode) : Day {
             var localMax = 0L
             var localMinDistance = Long.MAX_VALUE
 
-            var curPos = Point(nanobot.x, nanobot.y, nanobot.z)
+
             val toCheck = ArrayDeque<Point>()
-            toCheck.add(curPos)
+            toCheck.add(Point(nanobot.x, nanobot.y, nanobot.z))
 
             while (toCheck.isNotEmpty()) {
-                curPos = toCheck.poll()
+                val curPos = toCheck.poll()
                 val inRange = curPos.nanobotsInRange(input).toLong()
                 if (inRange < localMax)
                     continue
@@ -91,7 +98,11 @@ class Day23(override val adventOfCode: AdventOfCode) : Day {
                     localMax = inRange
                     localMinDistance = curPos.distanceTo(origin)
                 }
-                curPos.adjacent().forEach { toCheck.add(it) }
+
+                curPos.adjacent()
+                        .filter { it != curPos.prev }
+                        .filter { it !in toCheck }
+                        .forEach { toCheck.add(it) }
             }
 
             if (localMax >= maxInRange) {
