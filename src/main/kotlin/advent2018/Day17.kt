@@ -144,7 +144,7 @@ class Day17(override val adventOfCode: AdventOfCode) : Day {
         return ground
     }
 
-    override fun part1(): String {
+    override fun part1(): Any {
         val all = input.flatMap { line ->
             val numbers = line.extractInts()
             when(line[0]) {
@@ -174,7 +174,7 @@ class Day17(override val adventOfCode: AdventOfCode) : Day {
     }
     fun Array<IntArray>.getPoint(point: Point) = this[point.y][point.x]
     
-    override fun part2(): String {
+    override fun part2(): Any {
         val all = input.flatMap { line ->
             val numbers = line.extractInts()
             when(line[0]) {

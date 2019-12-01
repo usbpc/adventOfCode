@@ -7,7 +7,7 @@ class Day23(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 23
     private val input = adventOfCode.getInput(2017, day).lines().map{ it.split(' ')}
 
-    override fun part1(): String {
+    override fun part1(): Any {
         val registers = Day08.NeverNullMap<String, Long> { 0 }
         var ins = 0
         var counter = 0L
@@ -41,7 +41,7 @@ class Day23(override val adventOfCode: AdventOfCode) : Day {
         return counter.toString()
     }
 
-    override fun part2(): String {
+    override fun part2(): Any {
         var a = 1L
         var b = 81L
         var c = b

@@ -3,7 +3,6 @@ package advent2018
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
 import kotlin.math.abs
-import kotlin.math.min
 
 class Day23(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 23
@@ -43,7 +42,7 @@ class Day23(override val adventOfCode: AdventOfCode) : Day {
                 Point(x/other, y/other, z/other)
     }
 
-    override fun part1(): String {
+    override fun part1(): Any {
         val strongest = input.maxBy { it.range }!!
 
         var out = 0L
@@ -116,7 +115,7 @@ class Day23(override val adventOfCode: AdventOfCode) : Day {
         }
     }
 
-    override fun part2(): String {
+    override fun part2(): Any {
 
         val origin = Point(0,0,0)
 

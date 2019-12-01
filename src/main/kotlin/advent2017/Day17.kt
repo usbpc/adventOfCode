@@ -7,7 +7,7 @@ class Day17(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 17
     private val input = adventOfCode.getInput(2017, day).toInt()
 
-    override fun part1(): String {
+    override fun part1(): Any {
         var currentPos = 0
         val buffer = mutableListOf(0)
         for (counter in 1..2017) {
@@ -21,7 +21,7 @@ class Day17(override val adventOfCode: AdventOfCode) : Day {
         return buffer[(currentPos + 1) % buffer.size].toString()
     }
 
-    override fun part2(): String {
+    override fun part2(): Any {
         var curr = 0
         var currentPos = 0
         for (counter in 1..50000000) {

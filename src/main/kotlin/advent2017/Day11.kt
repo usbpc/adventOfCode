@@ -69,7 +69,7 @@ class Day11(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 11
     private val input = adventOfCode.getInput(2017, 11).split(',').map { Direction.getByShortName(it) }
 
-    override fun part1(): String {
+    override fun part1(): Any {
         return HexWalker(0, 0).apply {
             input.forEach {direction ->
                 walk(direction)
@@ -77,7 +77,7 @@ class Day11(override val adventOfCode: AdventOfCode) : Day {
         }.distanceToOrigin.toString()
     }
 
-    override fun part2(): String {
+    override fun part2(): Any {
         val hexWalker = HexWalker(0, 0)
         var maxDistance = 0
         input.forEach {

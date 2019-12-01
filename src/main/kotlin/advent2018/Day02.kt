@@ -8,12 +8,12 @@ class Day02(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 2
     val input = adventOfCode.getInput(2018, day).lines()
 
-    override fun part1(): String {
+    override fun part1(): Any {
         val charCounts = input.map { line -> line.groupBy { it }.map { it.value.size } }
         return "" + charCounts.count{ 2 in it } * charCounts.count { 3 in it }
     }
 
-    override fun part2(): String {
+    override fun part2(): Any {
         val out = StringBuilder()
         loop@for (i in 0 until input.size) {
             val current = input[i]

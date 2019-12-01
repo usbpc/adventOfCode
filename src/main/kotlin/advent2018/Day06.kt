@@ -30,7 +30,7 @@ class Day06(override val adventOfCode: AdventOfCode) : Day {
     }
 
 
-    override fun part1(): String {
+    override fun part1(): Any {
         val highestX = input.maxBy { it.x }!!.x
         val lowestX = input.minBy { it.x }!!.x
         val highestY = input.maxBy { it.y }!!.y
@@ -88,7 +88,7 @@ class Day06(override val adventOfCode: AdventOfCode) : Day {
         return "" + res.values.max()
     }
 
-    override fun part2(): String {
+    override fun part2(): Any {
         val highestX = input.maxBy { it.x }!!.x
         val lowestX = input.minBy { it.x }!!.x
         val highestY = input.maxBy { it.y }!!.y

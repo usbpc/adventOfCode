@@ -30,7 +30,7 @@ class Day05(override val adventOfCode: AdventOfCode) : Day {
         return stack.toString()
     }
 
-    override fun part1(): String {
+    override fun part1(): Any {
         return "" + input.reactPolymer().length
     }
 
@@ -38,7 +38,7 @@ class Day05(override val adventOfCode: AdventOfCode) : Day {
             this.replace(Regex("${c.toUpperCase()}|${c.toLowerCase()}"), "")
 
 
-    override fun part2(): String {
+    override fun part2(): Any {
         return "" + ('a'..'z').map { input.removeCaseInsensitive(it).reactPolymer() }.minBy { it.length }!!.length
     }
 }

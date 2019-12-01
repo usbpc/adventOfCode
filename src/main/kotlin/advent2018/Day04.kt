@@ -39,7 +39,7 @@ class Day04(override val adventOfCode: AdventOfCode) : Day {
 
     private val guardMap = Day08.NeverNullMap<Int, IntArray> { IntArray(60) }
 
-    override fun part1(): String {
+    override fun part1(): Any {
         var curGuard = 0
         var index = 0
         while (index < input.size) {
@@ -63,7 +63,7 @@ class Day04(override val adventOfCode: AdventOfCode) : Day {
         return "${mostAsleep * guardMap[mostAsleep].withIndex().maxBy { (_, value) -> value }!!.index }"
     }
 
-    override fun part2(): String {
+    override fun part2(): Any {
         val consistentAsleep = guardMap.toList().maxBy { (_, array ) -> array.max()!! }!!.first
 
         return "${ consistentAsleep * guardMap[consistentAsleep].withIndex().maxBy { (_, value) -> value }!!.index }"

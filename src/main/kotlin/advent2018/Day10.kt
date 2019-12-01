@@ -67,7 +67,7 @@ class Day10(override val adventOfCode: AdventOfCode) : Day {
         return out
     }
 
-    override fun part1(): String {
+    override fun part1(): Any {
         val bigToSmall = getLetterMap()
         val inputCopy = input.map { it.first.copy() to it.second.copy() }
         var distance = Long.MAX_VALUE
@@ -95,7 +95,7 @@ class Day10(override val adventOfCode: AdventOfCode) : Day {
                 .fold(StringBuilder()) { acc, c -> acc.append(c) }
     }
 
-    override fun part2(): String {
+    override fun part2(): Any {
         val inputCopy = input.map { it.first.copy() to it.second.copy() }
         var distance = Long.MAX_VALUE
         var counter = -1

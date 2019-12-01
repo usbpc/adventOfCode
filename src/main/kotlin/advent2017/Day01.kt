@@ -13,6 +13,6 @@ class Day01(override val adventOfCode: AdventOfCode): Day {
         return output
     }
 
-    override fun part1(): String = countWithOffset(1).toString()
-    override fun part2(): String = countWithOffset(input.length / 2).toString()
+    override fun part1(): Any = countWithOffset(1).toString()
+    override fun part2(): Any = countWithOffset(input.length / 2).toString()
 }

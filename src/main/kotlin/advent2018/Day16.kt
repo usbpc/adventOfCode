@@ -64,14 +64,14 @@ class Day16(override val adventOfCode: AdventOfCode) : Day {
 
     
 
-    override fun part1(): String =
+    override fun part1(): Any =
             input[0].getTestCases()
                     .onEach { testCase ->  testCase.testAllOpcodes() }
                     .count { it.possibleInstructions.size >= 3 }
                     .toString()
 
 
-    override fun part2(): String {
+    override fun part2(): Any {
         val testCases = input[0].getTestCases()
                 .onEach { testCase -> testCase.testAllOpcodes() }
 

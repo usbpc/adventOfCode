@@ -133,7 +133,7 @@ class Day13(override val adventOfCode: AdventOfCode) : Day {
         }
     }
 
-    override fun part1(): String {
+    override fun part1(): Any {
         var carts = parseInput()
         while (true) {
             for (cart in carts) {
@@ -148,7 +148,7 @@ class Day13(override val adventOfCode: AdventOfCode) : Day {
 
     private fun <E> MutableList<E>.pop() = this.removeAt(0)
 
-    override fun part2(): String {
+    override fun part2(): Any {
         var carts = parseInput()
         var ticks = 0
         while (carts.size > 1) {

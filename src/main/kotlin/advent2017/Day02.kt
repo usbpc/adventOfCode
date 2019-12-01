@@ -17,7 +17,7 @@ class Day02(override val adventOfCode: AdventOfCode) : Day {
         }
         input = tmp.toList()
     }
-    override fun part1(): String {
+    override fun part1(): Any {
         var checksum = 0L
         input.forEach {row ->
             var largest = Long.MIN_VALUE
@@ -33,7 +33,7 @@ class Day02(override val adventOfCode: AdventOfCode) : Day {
         return checksum.toString()
     }
 
-    override fun part2(): String {
+    override fun part2(): Any {
         var output = 0L
         input.forEach {row ->
             row.forEach {cur ->

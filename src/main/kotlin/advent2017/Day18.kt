@@ -12,7 +12,7 @@ class Day18(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 18
     private val input = adventOfCode.getInput(2017, day).lines().map {it.split(' ')}
 
-    override fun part1(): String {
+    override fun part1(): Any {
         val registers = Day08.NeverNullMap<String, Long> { 0 }
         var lastSoundPlayed = 0L
         var instruction = 0
@@ -63,7 +63,7 @@ class Day18(override val adventOfCode: AdventOfCode) : Day {
         return r
     }
 
-    override fun part2(): String {
+    override fun part2(): Any {
         val myContext = newSingleThreadContext("Day 18")
         val channel = arrayOf(Channel<Long>(1000), Channel<Long>(1000))
         val thing = AtomicInteger(0)

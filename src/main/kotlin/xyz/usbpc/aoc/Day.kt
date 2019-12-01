@@ -5,6 +5,6 @@ import xyz.usbpc.aoc.inputgetter.AdventOfCode
 interface Day {
     val adventOfCode: AdventOfCode
     val day: Int
-    fun part1(): String
-    fun part2(): String
+    fun part1(): Any
+    fun part2(): Any
 }

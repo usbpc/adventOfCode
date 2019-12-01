@@ -183,7 +183,7 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
         return null
     }
 
-    override fun part1(): String {
+    override fun part1(): Any {
         var characters = characterList().sorted()
         val arena = inputSpaceArray()
 
@@ -212,7 +212,7 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
         return "${counter * characters.sumBy { c -> c.health }}"
     }
 
-    override fun part2(): String {
+    override fun part2(): Any {
         var attack = 4
         outer@while (true) {
             var characters = characterList(attack++).sorted()

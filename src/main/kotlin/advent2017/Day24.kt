@@ -7,7 +7,7 @@ class Day24(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 24
     private val input = adventOfCode.getInput(2017, day).lines().map { it.split('/').map { it.toInt() }}
 
-    override fun part1(): String {
+    override fun part1(): Any {
         assert(input.size == input.toSet().count())
         val allthings = findAll().groupBy { it.size }
         //println(allthings.size)
@@ -32,7 +32,7 @@ class Day24(override val adventOfCode: AdventOfCode) : Day {
         }
         return dominos
     }
-    override fun part2(): String {
+    override fun part2(): Any {
         val result = findLongest()
         val dominos = mutableListOf<List<Int>>()
         var cur = 0

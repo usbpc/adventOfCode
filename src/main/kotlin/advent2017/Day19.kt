@@ -7,13 +7,13 @@ import xyz.usbpc.utils.Direction
 class Day19(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 19
     private val input = adventOfCode.getInput(2017, day).split('\n').map {it.toCharArray()}
-    override fun part1(): String {
+    override fun part1(): Any {
         val builder = StringBuilder()
         runTroughMaze {if (it.isLetter()) builder.append(it)}
         return builder.toString()
     }
 
-    override fun part2(): String {
+    override fun part2(): Any {
         var counter = -1
         runTroughMaze {counter++}
         return counter.toString()

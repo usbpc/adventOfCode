@@ -8,12 +8,12 @@ class Day10(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 10
     val input = adventOfCode.getInput(2017, 10)
 
-    override fun part1(): String {
+    override fun part1(): Any {
         val modified = IntArray(256) {it}.knot(input.split(',').map {it.toInt()}, 1)
         return (modified[0] * modified[1]).toString()
     }
 
-    override fun part2(): String {
+    override fun part2(): Any {
         return input.knotDenseHash()
                 .map {it.toString(16).padStart(2, '0')}.collect(StringBuilder(), StringBuilder::append).toString()
     }
