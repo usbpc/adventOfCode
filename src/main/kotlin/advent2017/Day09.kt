@@ -11,13 +11,13 @@ class Day09(override val adventOfCode: AdventOfCode) : Day {
     var part1: Int? = null
     var part2: Int? = null
 
-    override fun part1(): String {
+    override fun part1(): Any {
         if (part1 == null)
             solve()
         return part1.toString()
     }
 
-    override fun part2(): String {
+    override fun part2(): Any {
         if (part2 == null)
             solve()
         return part2.toString()

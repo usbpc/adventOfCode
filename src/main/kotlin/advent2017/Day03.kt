@@ -8,8 +8,8 @@ import kotlin.math.abs
 class Day03(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 3
     val input = adventOfCode.getInput(2017, 3).toInt()
-    override fun part1() = getManhattanDistanceToCenter(getCoordinatesForAdress(input)).toString()
-    override fun part2() = aWalkInThePark(347991).toString()
+    override fun part1(): Any = getManhattanDistanceToCenter(getCoordinatesForAdress(input)).toString()
+    override fun part2(): Any = aWalkInThePark(347991).toString()
     fun aWalkInThePark(adress: Int): Int {
         val dataStructure = GridDataStructure()
         dataStructure.set(Coordinates(0, 0), 1)

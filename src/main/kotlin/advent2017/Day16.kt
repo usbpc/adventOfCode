@@ -43,7 +43,7 @@ class Day16(override val adventOfCode: AdventOfCode) : Day {
         }
     }
 
-    override fun part1(): String {
+    override fun part1(): Any {
         var programOrder = "abcdefghijklmnop".toCharArray()
         transformedInput.forEach {
             programOrder = it(programOrder)
@@ -51,7 +51,7 @@ class Day16(override val adventOfCode: AdventOfCode) : Day {
         return String(programOrder)
     }
 
-    override fun part2(): String {
+    override fun part2(): Any {
         var programOrder = "abcdefghijklmnop".toCharArray()
         val counter = doWhileCount({!Arrays.equals("abcdefghijklmnop".toCharArray(), programOrder)}) {
             transformedInput.forEach {

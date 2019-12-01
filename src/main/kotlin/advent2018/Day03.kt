@@ -23,7 +23,7 @@ class Day03(override val adventOfCode: AdventOfCode) : Day {
 
     val grid = List(1000) { ByteArray(1000) }
 
-    override fun part1(): String {
+    override fun part1(): Any {
         input.filterNotNull().forEach { coord ->
             for (i in coord.left until coord.left+coord.x) {
                 for (j in coord.top until coord.top+coord.y) {
@@ -36,7 +36,7 @@ class Day03(override val adventOfCode: AdventOfCode) : Day {
         return "${grid.stream().flatMap { it.asSequence().asStream() }.filter {it >= 2}.count()}"
     }
 
-    override fun part2(): String {
+    override fun part2(): Any {
         input.filterNotNull().forEach { coord ->
             var candidate = true
             loop@for (i in coord.left until coord.left+coord.x) {

@@ -46,7 +46,7 @@ class Day07(override val adventOfCode: AdventOfCode) : Day {
     data class Step(val letter: Char, val children: MutableSet<Char> = mutableSetOf(), val needed : MutableSet<Char> = mutableSetOf())
 
 
-    override fun part1(): String {
+    override fun part1(): Any {
         val map = createStepMap(input)
 
         val next = mutableSetOf<Char>()
@@ -72,7 +72,7 @@ class Day07(override val adventOfCode: AdventOfCode) : Day {
 
     data class Worker(var letter: Char = ' ', var cooldown: Int = 0)
 
-    override fun part2(): String {
+    override fun part2(): Any {
         val map = createStepMap(input)
 
         val next = mutableSetOf<Char>()

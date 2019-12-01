@@ -2,7 +2,6 @@ package advent2018
 
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
-import java.util.*
 
 class Day21(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 21
@@ -75,7 +74,7 @@ class Day21(override val adventOfCode: AdventOfCode) : Day {
                 Instruction(op, numbers[0], numbers[1], numbers[2])
             }
 
-    override fun part1(): String {
+    override fun part1(): Any {
         val inst = input[0].extractInts()[0]
         val registers = LongArray(6)
         val program = input.getInstructions()
@@ -90,7 +89,7 @@ class Day21(override val adventOfCode: AdventOfCode) : Day {
         }
     }
 
-    override fun part2(): String {
+    override fun part2(): Any {
         val inst = input[0].extractInts()[0]
         val registers = LongArray(6)
         val program = input.getInstructions()

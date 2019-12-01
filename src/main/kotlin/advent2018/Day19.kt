@@ -1,10 +1,8 @@
 package advent2018
 
-import jdk.nashorn.internal.runtime.regexp.joni.constants.OPCode
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
 import java.lang.IllegalStateException
-import kotlin.math.sqrt
 
 class Day19(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 19
@@ -78,14 +76,14 @@ class Day19(override val adventOfCode: AdventOfCode) : Day {
         Instruction(op, numbers[0], numbers[1], numbers[2])
     }
 
-    override fun part1(): String {
+    override fun part1(): Any {
         val program = input.getInstructions()
         val toFactor = 2*2*19*11 + (program[21].B*22+program[23].B)
         return divisorSum(toFactor).toString()
     }
 
 
-    override fun part2(): String {
+    override fun part2(): Any {
         val program = input.getInstructions()
         val toFactor = 2*2*19*11 + (program[21].B*22+program[23].B) + ((27*28+29)*30*14*32)
         return divisorSum(toFactor).toString()

@@ -3,7 +3,6 @@ package advent2018
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
 import java.lang.StringBuilder
-import java.util.*
 
 class Day09(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 9
@@ -118,11 +117,11 @@ class Day09(override val adventOfCode: AdventOfCode) : Day {
         return scores.max()!!
     }
 
-    override fun part1(): String {
+    override fun part1(): Any {
         return "" + calculateWinningScore(input[0], input[1])
     }
 
-    override fun part2(): String {
+    override fun part2(): Any {
         return "" + calculateWinningScore(input[0], input[1]*100)
     }
 }

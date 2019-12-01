@@ -156,8 +156,8 @@ class Day20(override val adventOfCode: AdventOfCode) : Day {
         return results
     }
 
-    override fun part1(): String = getDistanceMap(input).maxBy { (_, steps) -> steps }!!.value.toString()
+    override fun part1(): Any = getDistanceMap(input).maxBy { (_, steps) -> steps }!!.value.toString()
 
 
-    override fun part2(): String = getDistanceMap(input).count { (_, steps) -> steps >= 1000 }.toString()
+    override fun part2(): Any = getDistanceMap(input).count { (_, steps) -> steps >= 1000 }.toString()
 }

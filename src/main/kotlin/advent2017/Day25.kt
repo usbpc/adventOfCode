@@ -22,7 +22,7 @@ class Day25(override val adventOfCode: AdventOfCode) : Day {
         curState to State(valOnZero, dirOnZero, stateOnZero, valOnOne, dirOnOne, stateOnOne)
     }
     private data class State(val valOnZero: Int, val dirOnZero: Int, val stateOnZero: Char, val valOnOne: Int, val dirOnOne: Int, val stateOnOne: Char)
-    override fun part1(): String {
+    override fun part1(): Any {
         var state  = startState
         var pos = 0
         var tape = Tape()
@@ -41,7 +41,7 @@ class Day25(override val adventOfCode: AdventOfCode) : Day {
         return tape.checksum().toString()
     }
 
-    override fun part2(): String {
+    override fun part2(): Any {
         return "Nothing to do here :)"
     }
     private class Tape {

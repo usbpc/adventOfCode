@@ -89,7 +89,7 @@ class Day18(override val adventOfCode: AdventOfCode) : Day {
         }
     }
 
-    override fun part1(): String {
+    override fun part1(): Any {
         var curState = input
 
         repeat(10) {
@@ -99,7 +99,7 @@ class Day18(override val adventOfCode: AdventOfCode) : Day {
         return (curState.flatten().count { sq -> sq == LumberArea.LUMBERYARD } *  curState.flatten().count { sq -> sq == LumberArea.TREE }).toString()
     }
 
-    override fun part2(): String {
+    override fun part2(): Any {
         var curState = input
         val previousStates : MutableMap<List<List<LumberArea>>, Int> = mutableMapOf()
 

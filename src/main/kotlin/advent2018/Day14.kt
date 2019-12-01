@@ -32,7 +32,7 @@ class Day14(override val adventOfCode: AdventOfCode) : Day {
         }
     }
 
-    override fun part1() = generateSequence().drop(input.toInt()).take(10).fold(StringBuilder()) { str, score -> str.append(score) }.toString()
+    override fun part1(): Any = generateSequence().drop(input.toInt()).take(10).fold(StringBuilder()) { str, score -> str.append(score) }.toString()
 
     private infix fun List<Byte>.match(that: List<Byte>) : Boolean {
         if (this.size != that.size)
@@ -44,7 +44,7 @@ class Day14(override val adventOfCode: AdventOfCode) : Day {
         return true
     }
 
-    override fun part2(): String {
+    override fun part2(): Any {
         val sequence = generateSequence().take(100).toList()
 
         val toFind = input.map { c -> (c - '0').toByte() }

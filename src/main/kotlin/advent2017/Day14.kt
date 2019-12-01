@@ -8,10 +8,10 @@ class Day14(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 14
     private val input = adventOfCode.getInput(2017, day)
 
-    override fun part1(): String = input.getMemoryMap().flatMap {it.asIterable()}.sumBy {if(it) 1 else 0}.toString()
+    override fun part1(): Any = input.getMemoryMap().flatMap {it.asIterable()}.sumBy {if(it) 1 else 0}.toString()
 
 
-    override fun part2(): String {
+    override fun part2(): Any {
         val memoryMap = input.getMemoryMap()
 
         var counter = 0

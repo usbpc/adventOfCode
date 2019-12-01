@@ -59,7 +59,7 @@ class Day08(override val adventOfCode: AdventOfCode) : Day {
         return node!!
     }*/
 
-    override fun part1(): String {
+    override fun part1(): Any {
         val tree = parseInput(input)
 
         val stack = Stack<Node>()
@@ -76,7 +76,7 @@ class Day08(override val adventOfCode: AdventOfCode) : Day {
         return "" + out
     }
 
-    override fun part2(): String {
+    override fun part2(): Any {
         val tree = parseInput(input)
 
         val stack = Stack<Node>()

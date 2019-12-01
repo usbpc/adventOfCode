@@ -19,8 +19,8 @@ class Day12(override val adventOfCode: AdventOfCode) : Day {
                         }.toMutableSet()
             }.toMap()
 
-    override fun part1(): String = getConnected(input, 0).size.toString()
-    override fun part2(): String =
+    override fun part1(): Any = getConnected(input, 0).size.toString()
+    override fun part2(): Any =
             input.keys.toMutableSet().let {
                 whileCount(it::isNotEmpty) {
                     val current = it.first()

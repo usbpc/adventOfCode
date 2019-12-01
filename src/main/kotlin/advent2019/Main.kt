@@ -1,4 +1,4 @@
-package advent2018
+package advent2019
 
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
@@ -7,7 +7,7 @@ import kotlin.system.measureTimeMillis
 fun main(args: Array<String>) {
     val adventOfCode = AdventOfCode(args[0])
     val list = mutableListOf<Day>().apply {
-        //add(Day01(adventOfCode))
+        add(Day01(adventOfCode))
         //add(Day02(adventOfCode))
         //add(Day03(adventOfCode))
         //add(Day04(adventOfCode))
@@ -31,7 +31,7 @@ fun main(args: Array<String>) {
         //add(Day22(adventOfCode))
         //add(Day23(adventOfCode))
         //add(Day24(adventOfCode))
-        add(Day25(adventOfCode))
+        //add(Day25(adventOfCode))
     }
     if (args.isEmpty()) {
         println("Please specify session id!")

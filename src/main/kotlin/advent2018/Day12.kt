@@ -12,7 +12,7 @@ class Day12(override val adventOfCode: AdventOfCode) : Day {
 
     class Transition(val from: BooleanArray, val to : Boolean)
 
-    override fun part1(): String {
+    override fun part1(): Any {
         val startState = initialStateRegex.find(input)!!.groups[1]!!.value.map { it == '#' }.toBooleanArray()
         var transitions = transitionRegex.findAll(input).map { result -> Transition(result.groups[1]!!.value.map { it == '#' }.toBooleanArray(), (result.groups[2]!!.value[0] == '#')) }
         val rowSize = 500
@@ -51,7 +51,7 @@ class Day12(override val adventOfCode: AdventOfCode) : Day {
         return out
     }
 
-    override fun part2(): String {
+    override fun part2(): Any {
         val startState = initialStateRegex.find(input)!!.groups[1]!!.value.map { it == '#' }.toBooleanArray()
         var transitions = transitionRegex.findAll(input).map { result -> Transition(result.groups[1]!!.value.map { it == '#' }.toBooleanArray(), (result.groups[2]!!.value[0] == '#')) }
         val fieldSize = 500

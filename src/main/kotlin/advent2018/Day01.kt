@@ -6,11 +6,11 @@ import xyz.usbpc.aoc.inputgetter.AdventOfCode
 class Day01(override val adventOfCode: AdventOfCode) : Day {
     override val day = 1
     val input = adventOfCode.getInput(2018, day).lines().map { it.toLong() }.toLongArray()
-    override fun part1(): String {
+    override fun part1(): Any {
         return "" + input.fold(0L) {a, n -> a+n}
     }
 
-    override fun part2(): String {
+    override fun part2(): Any {
         val known = mutableSetOf<Long>()
 
             var curr = 0L

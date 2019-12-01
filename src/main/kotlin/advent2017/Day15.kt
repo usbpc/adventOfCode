@@ -11,7 +11,7 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
             .map {inputRegex.find(it)?.groups?.get(1)?.value?.toInt()}
             .requireNoNulls()
 
-    override fun part1(): String {
+    override fun part1(): Any {
         val genA = generateSequence((input[0] * 16807L) % 2147483647L) {(it * 16807L) % 2147483647L}.constrainOnce()
         val genB = generateSequence((input[1] * 48271L) % 2147483647L) {(it * 48271L) % 2147483647L}.constrainOnce()
 
@@ -22,7 +22,7 @@ class Day15(override val adventOfCode: AdventOfCode) : Day {
                 .toString()
     }
 
-    override fun part2(): String {
+    override fun part2(): Any {
         val genA = generateSequence((input[0] * 16807L) % 2147483647L) {
             var prev = (it * 16807L) % 2147483647L
             while (prev % 4L != 0L)

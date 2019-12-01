@@ -63,7 +63,7 @@ class Day22(override val adventOfCode: AdventOfCode) : Day {
         }
     }
 
-    override fun part1(): String {
+    override fun part1(): Any {
         val depth = input[0][0]
         val target = Coord(input[1][0], input[1][1])
         var out = 0L
@@ -112,7 +112,7 @@ class Day22(override val adventOfCode: AdventOfCode) : Day {
 
     private data class QueueData(val curSit: CurrentSituation, val distance: Int)
 
-    override fun part2(): String {
+    override fun part2(): Any {
         val depth = input[0][0]
         val target = Coord(input[1][0], input[1][1])
 

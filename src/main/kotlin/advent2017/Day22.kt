@@ -10,7 +10,7 @@ class Day22(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 22
     private val input = adventOfCode.getInput(2017, day).lines().map { it.toCharArray() }
 
-    override fun part1(): String {
+    override fun part1(): Any {
         assert(input.size == input.first().size)
         assert(input.size % 2 != 0)
 
@@ -48,7 +48,7 @@ class Day22(override val adventOfCode: AdventOfCode) : Day {
         return counter.toString()
     }
 
-    override fun part2(): String {
+    override fun part2(): Any {
 
         val infected = mutableSetOf<Point>()
         val weakend = mutableSetOf<Point>()

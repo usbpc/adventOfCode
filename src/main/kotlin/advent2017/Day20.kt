@@ -37,7 +37,7 @@ class Day20(override val adventOfCode: AdventOfCode) : Day {
         }
     }
 
-    override fun part1(): String {
+    override fun part1(): Any {
         val accGroups = input.withIndex().groupBy {(_, particle) -> particle.totalAcceleration()}
         val minAcc = accGroups.keys.min() ?: NoSuchElementException("There were no particles?")
         val velGroups = accGroups[minAcc]!!.groupBy {(_, particle) -> particle.totalVelocity()}
@@ -45,7 +45,7 @@ class Day20(override val adventOfCode: AdventOfCode) : Day {
         return velGroups[minVel]!!.minBy {(_, particle) -> particle.distanceFromOrigin()}?.index.toString()
     }
 
-    override fun part2(): String {
+    override fun part2(): Any {
         var cur = input
         repeat(100) {
             cur = cur.withOutCollisions()

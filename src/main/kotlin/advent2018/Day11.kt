@@ -11,7 +11,7 @@ class Day11(override val adventOfCode: AdventOfCode) : Day {
 
     private fun Int.hundredsDigit() = (this % 1000) / 100
 
-    override fun part1(): String {
+    override fun part1(): Any {
         val grid = Array(300) { IntArray(300) }
         for (x in 1..300) {
             for (y in 1..300) {
@@ -51,7 +51,7 @@ class Day11(override val adventOfCode: AdventOfCode) : Day {
         return out
     }
 
-    override fun part2(): String {
+    override fun part2(): Any {
         val grid = Array(300) { IntArray(300) }
         for (x in 1..300) {
             for (y in 1..300) {

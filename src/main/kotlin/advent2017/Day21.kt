@@ -4,15 +4,13 @@ import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
 import xyz.usbpc.utils.collect
 import java.awt.image.BufferedImage
-import java.io.File
-import javax.imageio.ImageIO
 
 class Day21(override val adventOfCode: AdventOfCode) : Day {
     override val day: Int = 21
     private val input = adventOfCode.getInput(2017, day).lines().associate { line -> line.split(" => ").let { it[0] to it[1] } }
     //private val grid = listOf(".#.", "..#", "###").map { it.toList() }
 
-    override fun part1(): String {
+    override fun part1(): Any {
         var grid = ".#./..#/###".inflate()
         repeat(5) {
             grid = grid.enhance()
@@ -22,7 +20,7 @@ class Day21(override val adventOfCode: AdventOfCode) : Day {
         return grid.flatMap { it }.filter { it == '#' }.count().toString()
     }
 
-    override fun part2(): String {
+    override fun part2(): Any {
         var grid = ".#./..#/###".inflate()
         repeat(18) {
             grid = grid.enhance()
