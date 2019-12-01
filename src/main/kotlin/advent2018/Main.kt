@@ -29,9 +29,9 @@ fun main(args: Array<String>) {
         //add(Day20(adventOfCode))
         //add(Day21(adventOfCode))
         //add(Day22(adventOfCode))
-        add(Day23(adventOfCode))
+        //add(Day23(adventOfCode))
         //add(Day24(adventOfCode))
-        //add(Day25(adventOfCode))
+        add(Day25(adventOfCode))
     }
     if (args.isEmpty()) {
         println("Please specify session id!")

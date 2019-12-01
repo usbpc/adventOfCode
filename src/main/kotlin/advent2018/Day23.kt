@@ -146,14 +146,28 @@ class Day23(override val adventOfCode: AdventOfCode) : Day {
 
             }
         }
-        
-        val (point, bots) = twoMeet.first()
-        val tmpSet = mutableSetOf<Point>()
 
-        walkFromOrigin(point, { p -> bots.all { b -> b.distanceTo(p) <= b.range }} ) { p -> tmpSet.add(p) }
+
+        //val tmpSet = mutableSetOf<Point>()
+
+        //walkFromOrigin(point, { p -> bots.all { b -> b.distanceTo(p) <= b.range }} ) { p -> tmpSet.add(p) }
+
+        val list = mutableListOf<Set<NanoBot>>()
+
+        for ((point, bots) in twoMeet) {
+            val curSet = mutableSetOf<NanoBot>()
+            curSet.addAll(bots)
+
+            while (true) {
+                twoMeet.filter { (_, b) ->
+                            b.any { x -> x in bots }
+                }
+            }
+        }
 
         println("We got this far! We found: ${twoMeet.size}")
-        println("We got this far! We found: ${tmpSet.size}")
+
+        //println("We got this far! We found: ${tmpSet.size}")
 
         //println("These are all we got: $twoMeet")
 
