@@ -14,7 +14,7 @@ class Day02(override val adventOfCode: AdventOfCode) : Day {
             myInput[1] = 12
             myInput[2] = 2
 
-            return myInput.simulate()
+            return myInput.simulate()[0]
         }
     }
 
@@ -29,7 +29,7 @@ class Day02(override val adventOfCode: AdventOfCode) : Day {
                 myInput[1] = noun
                 myInput[2] = verb
 
-                if (myInput.simulate() == 19690720)
+                if (myInput.simulate()[0] == 19690720)
                     break
 
                 noun++

@@ -3,7 +3,8 @@ package advent2019
 object Intcode {
     fun String.parse() : List<Int> = this.split(",").map { it.toInt() }
 
-    fun MutableList<Int>.simulate() : Int {
+    fun MutableList<Int>.simulate() : List<Int> {
+        //Instruction pointer
         var ip = 0
 
         loop@while (true) {
@@ -24,6 +25,6 @@ object Intcode {
             }
         }
 
-        return this[0]
+        return this
     }
 }
