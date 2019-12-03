@@ -1,28 +1,18 @@
 package advent2019
 
+import advent2017.Day08
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
 import xyz.usbpc.utils.Direction
+import xyz.usbpc.utils.NeverNullMap
 import java.lang.IllegalStateException
 
 fun abs(x: Int) = if (x >= 0) x else -x
 
 data class Vector(val dir: Direction, val vel: Int)
 
-data class PointWithSteps(val point: Point, val steps: Int) {
-    override fun equals(other: Any?): Boolean {
-        if (other !is PointWithSteps)
-            return false
-        return point == (other as PointWithSteps).point
-    }
-
-    override fun hashCode(): Int {
-        return point.hashCode()
-    }
-}
-
 data class Point(val x: Int, val y: Int) {
-    public fun walk(dir: Direction) : Point {
+    fun walk(dir: Direction) : Point {
         return when (dir) {
             Direction.UP -> Point(x, y+1)
             Direction.DOWN -> Point(x, y-1)
@@ -69,27 +59,24 @@ class Day03(override val adventOfCode: AdventOfCode) : Day {
 
     override fun part2() : Any {
         val (one, two) = input.map { insts ->
-            val set = mutableSetOf<PointWithSteps>()
+            val map = NeverNullMap<Point, Int> { Int.MAX_VALUE }
             var steps = 0
             var cur = Point(0, 0)
             for (inst in insts) {
                 repeat(inst.vel) {
                     steps += 1
                     cur = cur.walk(inst.dir)
-                    set.add(PointWithSteps(cur, steps))
+                    map[cur] = steps
                 }
             }
-            set
+            map
         }
 
-        val output = one.intersect(two).map { it.point }.sortedBy { it.fromCenter() }.map { point ->
-            val first = one.single { it.point == point }
-            val second = two.single { it.point == point }
+        return one.keys.intersect(two.keys)
+                .sortedBy { it.fromCenter() }
+                .map { one[it] + two[it]}
+                .min().toString()
 
-            first.steps + second.steps
-        }.sorted()
-
-        return output.first()
     }
 
 }
