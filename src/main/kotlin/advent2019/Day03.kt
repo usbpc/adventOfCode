@@ -82,19 +82,14 @@ class Day03(override val adventOfCode: AdventOfCode) : Day {
             set
         }
 
-
-        val output = one.intersect(two).map { it.point }.sortedBy { it.fromCenter() }
-
-
-        val blah = output.map { thing ->
-            val first = one.single { it.point == thing }
-            val second = two.single { it.point == thing }
+        val output = one.intersect(two).map { it.point }.sortedBy { it.fromCenter() }.map { point ->
+            val first = one.single { it.point == point }
+            val second = two.single { it.point == point }
 
             first.steps + second.steps
         }.sorted()
 
-
-        return blah.first()
+        return output.first()
     }
 
 }
