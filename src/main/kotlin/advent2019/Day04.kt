@@ -20,23 +20,7 @@ class Day04(override val adventOfCode: AdventOfCode) : Day {
         } || (str[0] == str[1] && str[1] != str[2]) || (str[4] == str[5] && str[3] != str[4]))
     }
 
-    override fun part1() : Any {
-        var counter = 0
-        for (i in input[0]..input[1]) {
-            if (i.meetsCriteria())
-                counter++
-        }
-        return counter
-    }
+    override fun part1() : Any = (input[0]..input[1]).filter { it.meetsCriteria() }.count()
 
-    override fun part2() : Any {
-        var counter = 0
-        for (i in input[0]..input[1]) {
-            if (i.meetsStrictCriteria())
-            {
-                counter++
-            }
-        }
-        return counter
-    }
+    override fun part2() : Any = (input[0]..input[1]).filter { it.meetsStrictCriteria() }.count()
 }
