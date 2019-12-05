@@ -5,21 +5,20 @@ import xyz.usbpc.aoc.inputgetter.AdventOfCode
 
 class Day02(override val adventOfCode: AdventOfCode) : Day {
     override val day = 2
-    val input = Intcode.run { adventOfCode.getInput(2019, day).parse() }
+    val input = adventOfCode.getInput(2019, day).split(",").map { it.toInt() }
 
     override fun part1() : Any {
-        Intcode.run {
+
             val myInput = input.toMutableList()
 
             myInput[1] = 12
             myInput[2] = 2
 
-            return myInput.simulate()[0]
-        }
+            return myInput.runSimple()[0]
+
     }
 
     override fun part2() : Any {
-        Intcode.run {
             var noun = 0
             var verb = 0
 
@@ -29,7 +28,7 @@ class Day02(override val adventOfCode: AdventOfCode) : Day {
                 myInput[1] = noun
                 myInput[2] = verb
 
-                if (myInput.simulate()[0] == 19690720)
+                if (myInput.runSimple()[0] == 19690720)
                     break
 
                 noun++
@@ -40,6 +39,6 @@ class Day02(override val adventOfCode: AdventOfCode) : Day {
             }
 
         return 100 * noun + verb
-        }
+
     }
 }
