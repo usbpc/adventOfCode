@@ -75,6 +75,7 @@ class Day03(override val adventOfCode: AdventOfCode) : Day {
         return one.keys.intersect(two.keys)
                 .sortedBy { it.fromCenter() }
                 .minBy { one[it] + two[it]}
+                ?.fromCenter()
                 .toString()
 
     }
