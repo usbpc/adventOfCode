@@ -37,9 +37,9 @@ class Intcode(val state : MutableList<Int>, val input: ReceiveChannel<Int> = Cha
     var ip: Int = 0
 
     private fun getArg(offset: Int) : Int {
-        var thing = 10
-        repeat(offset) { thing *= 10 }
-        return when(val mode = (state[ip] / thing) % 10) {
+        var base = 10
+        repeat(offset) { base *= 10 }
+        return when(val mode = (state[ip] / base) % 10) {
             0 -> state[state[ip+offset]]
             1 -> state[ip+offset]
             else -> throw NotImplementedError("Mode $mode is nor implemented yet!")
