@@ -27,8 +27,6 @@ class Day06(override val adventOfCode: AdventOfCode) : Day {
             map[stat]!!.orbitBy.add(map[orbiter]!!)
         }
 
-        println(map)
-
         var counter = 0
 
         map.values.forEach {planet ->
