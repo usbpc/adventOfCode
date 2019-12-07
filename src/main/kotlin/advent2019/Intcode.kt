@@ -32,7 +32,7 @@ fun MutableList<Int>.runWithInput(`in`: List<Int>) = runBlocking {
 }
 
 //TODO make the channels mock channels that are actually closed!
-class Intcode(val state : MutableList<Int>, val input: ReceiveChannel<Int> = Channel(), val output: SendChannel<Int> = Channel()) {
+class Intcode(val state : MutableList<Int>, val input: ReceiveChannel<Int> = Channel(), val output: SendChannel<Int> = Channel(), val name : String = "", val debug: Boolean = false) {
     val out = mutableListOf<Int>()
     var ip: Int = 0
 
@@ -71,11 +71,17 @@ class Intcode(val state : MutableList<Int>, val input: ReceiveChannel<Int> = Cha
             }
 
             3 -> {
+                if (debug)
+                    println("$name: Trying to get input")
                 setArg(1, input.receive())
+                if (debug)
+                    println("$name: Got input! ${getArg(1)}")
                 ip += 2
             }
 
             4 -> {
+                if (debug)
+                    println("$name: Outputting ${getArg(1)}")
                 out.add(getArg(1))
                 output.send(getArg(1))
                 ip += 2
