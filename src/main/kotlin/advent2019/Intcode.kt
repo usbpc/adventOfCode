@@ -7,7 +7,7 @@ import kotlinx.coroutines.channels.SendChannel
 
 fun MutableList<Int>.runSimple() : List<Int> = runBlocking {
     val vm = Intcode(this@runSimple)
-    val vmRunner = vm.run { simulate() }
+    val vmRunner = launch { vm.simulate() }
     vmRunner.join()
     vm.state.toList()
 }
@@ -18,7 +18,7 @@ fun MutableList<Int>.runWithInput(`in`: List<Int>) = runBlocking {
 
     val vm = Intcode(this@runWithInput, input, output)
 
-    val vmRunner = vm.run { simulate() }
+    val vmRunner = launch { vm.simulate() }
 
     for (x in `in`)
         input.send(x)
@@ -52,9 +52,10 @@ class Intcode(val state : MutableList<Int>, val input: ReceiveChannel<Int> = Cha
 
     private fun Boolean.toInt() = if (this) 1 else 0
 
-    fun CoroutineScope.simulate() = launch {
+    suspend fun simulate() {
         while (step()) {}
     }
+
     /**
      * Steps forward one step.
      */
