@@ -21,7 +21,7 @@ class Day07(override val adventOfCode: AdventOfCode) : Day {
 
     override fun part1() : Any = (0..4).permutations().map { doSimulation(it) }.max()!!
 
-    fun doFeedbackSimulation(inputs: List<Int>) : Int = runBlocking {
+    suspend fun doFeedbackSimulation(inputs: List<Int>) : Int {
         val inChannels = inputs.map {
             val inCh = Channel<Int>(5)
             inCh.send(it)
@@ -35,16 +35,22 @@ class Day07(override val adventOfCode: AdventOfCode) : Day {
         var num = 1
         val vms = inChannels.zipWithNext().map { (inCh, outCh) -> Intcode(input.toMutableList(), inCh, outCh, "VM ${num++}") }
 
-        vms.map {vm ->
-            launch {
-                vm.simulate()
+        coroutineScope {
+            vms.forEach { vm ->
+                launch {
+                    vm.simulate()
+                }
             }
-        }.forEach { it.join() }
+        }
 
-        vms.last().out.last()
+        return vms.last().out.last()
     }
 
-    override fun part2() : Any = (5..9).permutations().map { doFeedbackSimulation(it) }.max()!!
+    override fun part2() : Any {
 
+        return runBlocking {
+            (5..9).permutations().map { async { doFeedbackSimulation(it) } }.toList().awaitAll().max()!!
+        }
 
+    }
 }
