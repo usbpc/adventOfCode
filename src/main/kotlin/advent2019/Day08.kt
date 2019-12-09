@@ -45,8 +45,8 @@ class Day08(override val adventOfCode: AdventOfCode) : Day {
         override fun toString(): String {
             return when (this) {
                 White -> "█"
-                Black -> "░"
-                Transparent -> " "
+                Transparent -> "░"
+                Black -> " "
             }
         }
     }

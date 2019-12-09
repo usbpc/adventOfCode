@@ -28,7 +28,7 @@ class Day02(override val adventOfCode: AdventOfCode) : Day {
                 myInput[1] = noun
                 myInput[2] = verb
 
-                if (myInput.runSimple()[0] == 19690720)
+                if (myInput.runSimple()[0] == 19690720L)
                     break
 
                 noun++
