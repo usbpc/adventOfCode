@@ -107,7 +107,7 @@ class Intcode(val state : MutableList<Long>, val input: ReceiveChannel<Long> = C
      * Steps forward one step.
      */
     suspend fun step() : Boolean {
-        println(this)
+        //println(this)
         when ((state[ip] % 100).toInt()) {
             1 -> {
                 setArg(3, getArg(1) + getArg(2))

@@ -13,10 +13,6 @@ class Day09(override val adventOfCode: AdventOfCode) : Day {
     val input = adventOfCode.getInput(2019, day).split(",").map { it.toInt() }
 
     override fun part1() : Any {
-        val quine = "1102,34915192,34915192,7,4,7,99,0".split(",").map { it.toLong() }
-        println(quine.toMutableList().runWithLongInput(listOf()).out)
-
-
         return input.toMutableList().runWithInput(listOf(1)).out
     }
     override fun part2() : Any {
