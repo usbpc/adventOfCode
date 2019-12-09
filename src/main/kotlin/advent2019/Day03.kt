@@ -57,7 +57,6 @@ class Day03(override val adventOfCode: AdventOfCode) : Day {
         return one.intersect(two).sortedBy { it.fromCenter() }.first().fromCenter()
     }
 
-    //TODO this is not working!
     override fun part2() : Any {
         val (one, two) = input.map { insts ->
             val map = NeverNullMap<Point, Int> { Int.MAX_VALUE }

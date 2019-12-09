@@ -8,17 +8,10 @@ import xyz.usbpc.utils.permutations
 
 class Day07(override val adventOfCode: AdventOfCode) : Day {
     override val day = 7
-    override fun part1(): Any {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun part2(): Any {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
 
     val input = adventOfCode.getInput(2019, day).split(",").map{ it.toInt()}
 
-    /*
+
     fun doSimulation(inputs: List<Int>) : Int {
         var prev = 0
         for (i in inputs) {
@@ -29,9 +22,9 @@ class Day07(override val adventOfCode: AdventOfCode) : Day {
 
     override fun part1() : Any = (0..4).permutations().map { doSimulation(it) }.max()!!
 
-    suspend fun doFeedbackSimulation(inputs: List<Int>) : Int {
+    suspend fun doFeedbackSimulation(inputs: List<Long>) : Long {
         val inChannels = inputs.map {
-            val inCh = Channel<Int>(5)
+            val inCh = Channel<Long>(5)
             inCh.send(it)
             inCh
         }.toMutableList()
@@ -57,10 +50,10 @@ class Day07(override val adventOfCode: AdventOfCode) : Day {
     override fun part2() : Any {
 
         return runBlocking {
-            (5..9).permutations().map { async { doFeedbackSimulation(it) } }.toList().awaitAll().max()!!
+            (5..9).map { it.toLong() }.permutations().map { async { doFeedbackSimulation(it) } }.toList().awaitAll().max()!!
         }
 
     }
-    */
+
 
 }

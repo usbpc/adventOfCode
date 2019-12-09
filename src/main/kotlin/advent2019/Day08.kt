@@ -61,12 +61,12 @@ class Day08(override val adventOfCode: AdventOfCode) : Day {
             data[height][width] = data[height][width].addOther(colour)
         }
 
-        fun print() {
+        fun print() : String = buildString {
             for (row in data) {
                 for (pixel in row) {
-                    print(pixel)
+                    append(pixel)
                 }
-                print('\n')
+                append('\n')
             }
         }
     }
@@ -82,8 +82,6 @@ class Day08(override val adventOfCode: AdventOfCode) : Day {
                     }
         }
 
-        img.print()
-
-        return ""
+        return "\n" + img.print()
     }
 }

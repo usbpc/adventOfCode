@@ -4,6 +4,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
+import java.lang.StringBuilder
 
 fun MutableList<Int>.runSimple() : List<Long> = runBlocking {
     val vm = Intcode(this@runSimple.map { it.toLong() }.toMutableList())
@@ -92,6 +93,21 @@ class Intcode(val state : MutableList<Long>, val input: ReceiveChannel<Long> = C
         ChangeRelativeBase(2),
         StopExecution(1);
 
+        override fun toString(): String {
+            return when (this) {
+                Add -> "ADD"
+                Multiply -> "MUL"
+                Read -> "READ"
+                Write -> "WRITE"
+                JumpNotZero -> "JNZ"
+                JumpIfZero -> "JIZ"
+                LessThan -> "LZ"
+                Equals -> "EQ"
+                ChangeRelativeBase -> "CRB"
+                StopExecution -> "HALT"
+            }
+        }
+
         companion object {
             fun fromIntcode(inst: Long): Instruction {
                 val pure = (inst % 100).toInt()
@@ -118,12 +134,42 @@ class Intcode(val state : MutableList<Long>, val input: ReceiveChannel<Long> = C
 
     suspend fun step() : Boolean {
         val instruction = Instruction.fromIntcode(ip.read())
+
+        if (debug)
+            println(instruction.debugString())
+
         val res = instruction.execute()
 
         if (res == OperationResult.IncrementIP)
             ip += instruction.size
 
         return res != OperationResult.Halt
+    }
+
+    private fun Instruction.debugString() : String {
+        val builder = StringBuilder()
+
+        builder.apply {
+            append("-----------------------------------------------------------------------\n")
+            append("Instruction Pointer: ").append(ip)
+            append("\nRelative Base: ").append(relativeBase)
+            append("\nCurrent Instruction: ").append(this@debugString).append('\n')
+        }
+
+        when (this) {
+            Instruction.Add -> builder.append('[').append(getIndex(3)).append("] = ").append(getIndex(1).read()).append(" + ").append(getIndex(2).read())
+            Instruction.Multiply -> builder.append('[').append(getIndex(3)).append("] = ").append(getIndex(1).read()).append(" * ").append(getIndex(2).read())
+            Instruction.Read -> builder.append('[').append(getIndex(1)).append("] = INPUT")
+            Instruction.Write -> builder.append("OUTPUT = ").append(getIndex(1).read())
+            Instruction.JumpNotZero -> builder.append("JUMP TO ").append(getIndex(2).read()).append(" IF ").append(getIndex(1).read()).append(" NOT ZERO")
+            Instruction.JumpIfZero -> builder.append("JUMP TO ").append(getIndex(2).read()).append(" IF ").append(getIndex(1).read()).append(" IS ZERO")
+            Instruction.LessThan -> builder.append('[').append(getIndex(3)).append("] = ").append(getIndex(1).read()).append(" < ").append(getIndex(2).read())
+            Instruction.Equals -> builder.append('[').append(getIndex(3)).append("] = ").append(getIndex(1).read()).append(" == ").append(getIndex(2).read())
+            Instruction.ChangeRelativeBase -> builder.append("REALTIVEBASE += ").append(getIndex(1).read())
+            Instruction.StopExecution -> builder.append("STOP EXECUTION")
+        }
+
+        return builder.toString()
     }
 
     private suspend fun Instruction.execute() : OperationResult {
