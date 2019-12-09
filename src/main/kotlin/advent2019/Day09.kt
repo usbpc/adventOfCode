@@ -13,11 +13,9 @@ class Day09(override val adventOfCode: AdventOfCode) : Day {
     val input = adventOfCode.getInput(2019, day).split(",").map { it.toInt() }
 
     override fun part1() : Any {
-        return input.toMutableList().runWithInput(listOf(1)).out
+        return input.toMutableList().runWithInput(listOf(1)).out.single()
     }
     override fun part2() : Any {
-
-
-        return input.toMutableList().runWithInput(listOf(2)).out
+        return input.toMutableList().runWithInput(listOf(2)).out.single()
     }
 }

@@ -4,9 +4,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
-import xyz.usbpc.utils.repeat
-import java.lang.IllegalStateException
-import java.lang.StringBuilder
 
 fun MutableList<Int>.runSimple() : List<Long> = runBlocking {
     val vm = Intcode(this@runSimple.map { it.toLong() }.toMutableList())
@@ -59,148 +56,139 @@ class Intcode(val state : MutableList<Long>, val input: ReceiveChannel<Long> = C
     var ip: Int = 0
     var relativeBase = 0
 
-    private fun getArg(offset: Int) : Long {
+    fun getIndex(offset: Int) : Int {
         var base = 10
-        repeat(offset.toInt()) { base *= 10 }
-        val thing = when(val mode = ((state[ip] / base) % 10).toInt()) {
+        repeat(offset) { base *= 10 }
+        return when(val mode = ((state[ip] / base) % 10).toInt()) {
             0 -> state[ip+offset].toInt()
             1 -> ip+offset
             2 -> relativeBase + state[ip+offset].toInt()
-            else -> throw NotImplementedError("Mode $mode is nor implemented yet!")
+            else -> throw IllegalStateException("$mode is not a valid mode!")
         }
-
-        if (thing >= state.size) {
-            while (thing >= state.size)
-                state.add(0)
-        }
-
-        return state[thing]
     }
 
-    private fun setArg(offset: Int, value: Long) {
-        var base = 10
-        repeat(offset) { base *= 10 }
-        val thing = when(val mode = ((state[ip] / base) % 10).toInt()) {
-            0 -> state[ip+offset].toInt()
-            1 -> throw IllegalStateException("Direct mode not allowed for setting")
-            2 -> relativeBase + state[ip+offset].toInt()
-            else -> throw NotImplementedError("Mode $mode is nor implemented yet!")
-        }
-
-        if (thing >= state.size) {
-            while (thing >= state.size)
-                state.add(0)
-        }
-
-        state[thing] = value
+    fun Int.read() : Long = if (this < state.size) state[this] else 0
+    fun Int.write(value: Long) {
+        while (this >= state.size)
+            state.add(0)
+        state[this] = value
     }
 
-    private fun Boolean.toInt() = if (this) 1 else 0
+    enum class OperationResult {
+        Halt,
+        IncrementIP,
+        Continue
+    }
 
-    private fun Boolean.toLong() = if (this) 1L else 0L
+    enum class Instruction(val size: Int) {
+        Add(4),
+        Multiply(4),
+        Read(2),
+        Write(2),
+        JumpNotZero(3),
+        JumpIfZero(3),
+        LessThan(4),
+        Equals(4),
+        ChangeRelativeBase(2),
+        StopExecution(1);
+
+        companion object {
+            fun fromIntcode(inst: Long): Instruction {
+                val pure = (inst % 100).toInt()
+                return when (pure) {
+                    1 -> Add
+                    2 -> Multiply
+                    3 -> Read
+                    4 -> Write
+                    5 -> JumpNotZero
+                    6 -> JumpIfZero
+                    7 -> LessThan
+                    8 -> Equals
+                    9 -> ChangeRelativeBase
+                    99 -> StopExecution
+                    else -> throw IllegalStateException("$pure is not a valid instruction!")
+                }
+            }
+        }
+    }
 
     suspend fun simulate() {
-        while (step()) {}
+        while(step()) {}
     }
 
-    /**
-     * Steps forward one step.
-     */
     suspend fun step() : Boolean {
-        //println(this)
-        when ((state[ip] % 100).toInt()) {
-            1 -> {
-                setArg(3, getArg(1) + getArg(2))
-                ip += 4
-            }
+        val instruction = Instruction.fromIntcode(ip.read())
+        val res = instruction.execute()
 
-            2 -> {
-                setArg(3, getArg(1) * getArg(2))
-                ip += 4
-            }
+        if (res == OperationResult.IncrementIP)
+            ip += instruction.size
 
-            3 -> {
-                if (debug)
-                    println("$name: Trying to get input")
-                setArg(1, input.receive())
-                if (debug)
-                    println("$name: Got input! ${getArg(1)}")
-                ip += 2
-            }
+        return res != OperationResult.Halt
+    }
 
-            4 -> {
-                if (debug)
-                    println("$name: Outputting ${getArg(1)}")
-                out.add(getArg(1))
-                output.send(getArg(1))
-                ip += 2
+    private suspend fun Instruction.execute() : OperationResult {
+        return when (this) {
+            Instruction.Add -> {
+                getIndex(3).write(getIndex(1).read() + getIndex(2).read())
+                OperationResult.IncrementIP
             }
-
-            5 -> {
-                if (getArg(1) != 0L) {
-                    ip = getArg(2).toInt()
-                } else {
-                    ip += 3
+            Instruction.Multiply -> {
+                getIndex(3).write(getIndex(1).read() * getIndex(2).read())
+                OperationResult.IncrementIP
+            }
+            Instruction.Read -> {
+                getIndex(1).write(input.receive())
+                OperationResult.IncrementIP
+            }
+            Instruction.Write -> {
+                getIndex(1).read().let {
+                    output.send(it)
+                    out.add(it)
+                }
+                OperationResult.IncrementIP
+            }
+            Instruction.JumpNotZero -> {
+                if (getIndex(1).read() != 0L) {
+                    ip = getIndex(2).read().toInt()
+                    OperationResult.Continue
+                }
+                else {
+                    OperationResult.IncrementIP
                 }
             }
-
-            6 -> {
-                if (getArg(1) == 0L) {
-                    ip = getArg(2).toInt()
-                } else {
-                    ip += 3
+            Instruction.JumpIfZero -> {
+                if (getIndex(1).read() == 0L) {
+                    ip = getIndex(2).read().toInt()
+                    OperationResult.Continue
+                }
+                else {
+                    OperationResult.IncrementIP
                 }
             }
-
-            7 -> {
-                setArg(3, (getArg(1) < getArg(2)).toLong())
-                ip += 4
+            Instruction.LessThan -> {
+                val res = if (getIndex(1).read() < getIndex(2).read())
+                    1L
+                else
+                    0L
+                getIndex(3).write(res)
+                OperationResult.IncrementIP
             }
-
-            8 -> {
-                setArg(3, (getArg(1) == getArg(2)).toLong())
-                ip += 4
+            Instruction.Equals -> {
+                val res = if (getIndex(1).read() == getIndex(2).read())
+                    1L
+                else
+                    0L
+                getIndex(3).write(res)
+                OperationResult.IncrementIP
             }
-
-            9 -> {
-                relativeBase += getArg(1).toInt()
-                ip += 2
+            Instruction.ChangeRelativeBase -> {
+                relativeBase += getIndex(1).read().toInt()
+                OperationResult.IncrementIP
             }
-
-            99 -> {
+            Instruction.StopExecution -> {
                 output.close()
-                return false
+                OperationResult.Halt
             }
-
-            else -> throw NotImplementedError("Opcode ${state[ip]} is not implemented yet!")
         }
-
-        return true
-    }
-
-    private fun getSafe(index: Int) : Long {
-        return if (index < state.size)
-            state[index]
-        else
-            0L
-    }
-
-    override fun toString(): String {
-        val builder = StringBuilder()
-
-
-        builder.append("Instruction pointer: ")
-        builder.append(ip)
-        builder.append(" Current instruction: ")
-
-        for (i in ip..ip+3) {
-            builder.append(getSafe(i))
-            builder.append(", ")
-        }
-
-        builder.deleteCharAt(builder.lastIndex)
-        builder.deleteCharAt(builder.lastIndex)
-
-        return builder.toString()
     }
 }
