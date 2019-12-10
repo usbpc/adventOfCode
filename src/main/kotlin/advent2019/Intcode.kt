@@ -6,7 +6,7 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import java.lang.StringBuilder
 
-fun MutableList<Int>.runSimple() : List<Long> = runBlocking {
+fun MutableList<Int>.runSimple(): List<Long> = runBlocking {
     val vm = Intcode(this@runSimple.map { it.toLong() }.toMutableList())
     val vmRunner = launch { vm.simulate() }
     vmRunner.join()
@@ -25,7 +25,8 @@ fun MutableList<Int>.runWithInput(`in`: List<Int>) = runBlocking {
         input.send(x.toLong())
     input.close()
 
-    for (x in output) {}
+    for (x in output) {
+    }
 
     vmRunner.join()
 
@@ -44,7 +45,8 @@ fun MutableList<Long>.runWithLongInput(`in`: List<Long>) = runBlocking {
         input.send(x)
     input.close()
 
-    for (x in output) {}
+    for (x in output) {
+    }
 
     vmRunner.join()
 
@@ -52,23 +54,29 @@ fun MutableList<Long>.runWithLongInput(`in`: List<Long>) = runBlocking {
 }
 
 //TODO make the channels mock channels that are actually closed!
-class Intcode(val state : MutableList<Long>, val input: ReceiveChannel<Long> = Channel(), val output: SendChannel<Long> = Channel(), val name : String = "", val debug: Boolean = false) {
+class Intcode(
+        val state: MutableList<Long>,
+        val input: ReceiveChannel<Long> = Channel(),
+        val output: SendChannel<Long> = Channel(),
+        val name: String = "",
+        val debug: Boolean = false
+) {
     val out = mutableListOf<Long>()
     var ip: Int = 0
     var relativeBase = 0
 
-    fun getIndex(offset: Int) : Int {
+    fun getIndex(offset: Int): Int {
         var base = 10
         repeat(offset) { base *= 10 }
-        return when(val mode = ((state[ip] / base) % 10).toInt()) {
-            0 -> state[ip+offset].toInt()
-            1 -> ip+offset
-            2 -> relativeBase + state[ip+offset].toInt()
+        return when (val mode = ((state[ip] / base) % 10).toInt()) {
+            0 -> state[ip + offset].toInt()
+            1 -> ip + offset
+            2 -> relativeBase + state[ip + offset].toInt()
             else -> throw IllegalStateException("$mode is not a valid mode!")
         }
     }
 
-    fun Int.read() : Long = if (this < state.size) state[this] else 0
+    fun Int.read(): Long = if (this < state.size) state[this] else 0
     fun Int.write(value: Long) {
         while (this >= state.size)
             state.add(0)
@@ -129,10 +137,11 @@ class Intcode(val state : MutableList<Long>, val input: ReceiveChannel<Long> = C
     }
 
     suspend fun simulate() {
-        while(step()) {}
+        while (step()) {
+        }
     }
 
-    suspend fun step() : Boolean {
+    suspend fun step(): Boolean {
         val instruction = Instruction.fromIntcode(ip.read())
 
         if (debug)
@@ -146,7 +155,7 @@ class Intcode(val state : MutableList<Long>, val input: ReceiveChannel<Long> = C
         return res != OperationResult.Halt
     }
 
-    private fun Instruction.debugString() : String {
+    private fun Instruction.debugString(): String {
         val builder = StringBuilder()
 
         builder.apply {
@@ -172,7 +181,7 @@ class Intcode(val state : MutableList<Long>, val input: ReceiveChannel<Long> = C
         return builder.toString()
     }
 
-    private suspend fun Instruction.execute() : OperationResult {
+    private suspend fun Instruction.execute(): OperationResult {
         return when (this) {
             Instruction.Add -> {
                 getIndex(3).write(getIndex(1).read() + getIndex(2).read())
@@ -197,8 +206,7 @@ class Intcode(val state : MutableList<Long>, val input: ReceiveChannel<Long> = C
                 if (getIndex(1).read() != 0L) {
                     ip = getIndex(2).read().toInt()
                     OperationResult.Continue
-                }
-                else {
+                } else {
                     OperationResult.IncrementIP
                 }
             }
@@ -206,8 +214,7 @@ class Intcode(val state : MutableList<Long>, val input: ReceiveChannel<Long> = C
                 if (getIndex(1).read() == 0L) {
                     ip = getIndex(2).read().toInt()
                     OperationResult.Continue
-                }
-                else {
+                } else {
                     OperationResult.IncrementIP
                 }
             }
