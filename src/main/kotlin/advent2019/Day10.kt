@@ -1,11 +1,7 @@
 package advent2019
 
-import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
-import xyz.usbpc.utils.permutations
-import java.lang.IllegalStateException
 
 class Day10(override val adventOfCode: AdventOfCode) : Day {
     override val day = 10
@@ -20,33 +16,25 @@ class Day10(override val adventOfCode: AdventOfCode) : Day {
             val difference = this - start
 
             if (difference.x == 0) {
-                if (this.x != other.x)
-                    return false
-                val solution = (other.y - start.y) / difference.y
-                val test = Point(x, solution*difference.y + start.y)
-                return test == other
+                if (start.x == other.x)
+                    return true
             } else if (difference.y == 0) {
-                if (this.y != other.y)
-                    return false
-                val solution = (other.x - start.x) / difference.x
-                val test = Point(solution*difference.x + start.x, y)
-                return test == other
-            }
+                if (start.y == other.y)
+                    return true
+            } else {
+                val a = (other.x - start.x) / difference.x
+                val b = (other.y - start.y) / difference.y
 
-            val a = if (difference.x == 0) 0 else (other.x - start.x) / difference.x
-            val b = if (difference.y == 0) 0 else (other.y - start.y) / difference.y
-
-            if ((a == b && a > 0) || (a == 0 && b != 0) || (b == 0  && a != 0)) {
-                val test = this + Point(difference.x*a+start.x, difference.y*a+start.y)
-                return other == test
+                if (a == b && a > 0) {
+                    val test = start + Point(difference.x*a, difference.y*a)
+                    return other == test
+                }
             }
             return false
         }
     }
 
     override fun part1() : Any {
-        val maxX = input.first().lastIndex
-        val maxY = input.lastIndex
         val asteroids = mutableSetOf<Point>().also { asteroids ->
             input.withIndex().forEach { (y, line) ->
                 line.withIndex().forEach { (x, char) ->
@@ -57,26 +45,29 @@ class Day10(override val adventOfCode: AdventOfCode) : Day {
             }
         }.toSet()
 
-        var maxCanSee = 0
-
+        var maxCanSee = setOf<Point>()
         for (asteroid in asteroids) {
-            println("Dealing with $asteroid")
+            //println("Dealing with $asteroid")
             val canSee = asteroids.toMutableSet()
             canSee.remove(asteroid)
-            for (other in asteroids) {
+
+            test@for (other in asteroids) {
                 if (other == asteroid)
-                    continue
-                for (thing in asteroids) {
+                    continue@test
+
+                test2@for (thing in asteroids) {
                     if (thing == asteroid || thing == other)
-                        continue
+                        continue@test2
                     if (other.isInLine(asteroid, thing))
                         canSee.remove(thing)
                 }
             }
-            if (canSee.size > maxCanSee)
-                maxCanSee = canSee.size
+            if (canSee.size > maxCanSee.size) {
+                println("Max right now is $asteroid")
+                maxCanSee = canSee
+            }
         }
-        return maxCanSee
+        return maxCanSee.size
     }
     override fun part2() : Any {
         return ""
