@@ -31,6 +31,13 @@ class Day11(override val adventOfCode: AdventOfCode) : Day {
                 White -> 1L
             }
         }
+
+        fun toChar() : Char {
+            return when (this) {
+                Black -> '░'
+                White -> '█'
+            }
+        }
     }
 
     fun Point.turnRight() : Point {
@@ -58,6 +65,8 @@ class Day11(override val adventOfCode: AdventOfCode) : Day {
 
         var dir = Point(0, -1)
         var curPos = Point(0, 0)
+
+        ret[curPos] = Colour.White
 
         val inCh = Channel<Long>()
         val outCh = Channel<Long>()
@@ -97,8 +106,27 @@ class Day11(override val adventOfCode: AdventOfCode) : Day {
 
         vm
 
+        val maxX = ret.keys.maxBy { it.x }!!.x
+        val minX = ret.keys.minBy { it.x }!!.x
+        val maxY = ret.keys.maxBy { it.y }!!.y
+        val minY = ret.keys.minBy { it.y }!!.y
 
-        ret.size
+        buildString {
+            this.append('\n')
+            for (y in minY..maxY) {
+                for (x in minX..maxX) {
+                    val cur = Point(x, y)
+                    if (ret.containsKey(cur)) {
+                        ret[cur]?.let {
+                            this.append(it.toChar())
+                        }
+                    } else {
+                        this.append(' ')
+                    }
+                }
+                this.append('\n')
+            }
+        }
     }
 
     override fun part2() : Any {
