@@ -2,9 +2,7 @@ package advent2019
 
 import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
-import xyz.usbpc.utils.permutations
 import java.lang.IllegalStateException
-import java.util.*
 
 fun gcd(x: Int, y: Int) : Int {
     var a = x
@@ -38,13 +36,13 @@ class Day10(override val adventOfCode: AdventOfCode) : Day {
         }
 
         fun calculateQuadrant() : Quadrant {
-            return if (this.x >= 0 && this.y >= 0) {
+            return if (this.x >= 0 && this.y <= 0) {
                 Quadrant.TopRight
-            } else if (this.x >= 0 && this.y < 0) {
+            } else if (this.x >= 0 && this.y > 0) {
                 Quadrant.BottomRight
-            } else if (this.x < 0 && this.y <= 0) {
+            } else if (this.x < 0 && this.y >= 0) {
                 Quadrant.BottomLeft
-            } else if (this.x < 0 && this.y > 0) {
+            } else if (this.x < 0 && this.y < 0) {
                 Quadrant.TopLeft
             } else {
                 throw IllegalStateException("This can't happen!")
@@ -52,61 +50,46 @@ class Day10(override val adventOfCode: AdventOfCode) : Day {
         }
 
         override fun compareTo(other: Point): Int {
-            val athing = this.calculateQuadrant()
-            val bthing = other.calculateQuadrant()
+            val aQuadrant = this.calculateQuadrant()
+            val bQuadrant = other.calculateQuadrant()
 
-
-            val aslope = this.slope()
-            val bslope = other.slope()
-            if (athing == bthing) {
-                when (athing) {
-                    Quadrant.TopRight -> {
+            val aSlope = this.slope()
+            val bSlope = other.slope()
+            if (aQuadrant == bQuadrant) {
+                when (aQuadrant) {
+                    Quadrant.TopRight, Quadrant.BottomRight -> {
                         return when {
-                            aslope > bslope -> -1
-                            aslope < bslope -> 1
+                            aSlope > bSlope -> 1
+                            aSlope < bSlope -> -1
                             else -> 0
                         }
                     }
-                    Quadrant.BottomRight -> {
+                    Quadrant.BottomLeft, Quadrant.TopLeft -> {
                         return when {
-                            aslope > bslope -> -1
-                            aslope < bslope -> 1
-                            else -> 0
-                        }
-                    }
-                    Quadrant.BottomLeft -> {
-                        return when {
-                            aslope > bslope -> -1
-                            aslope < bslope -> 1
-                            else -> 0
-                        }
-                    }
-                    Quadrant.TopLeft -> {
-                        return when {
-                            aslope > bslope -> -1
-                            aslope < bslope -> 1
+                            aSlope > bSlope -> 1
+                            aSlope < bSlope -> -1
                             else -> 0
                         }
                     }
                 }
             }
 
-            if (athing == Quadrant.TopRight) {
+            if (aQuadrant == Quadrant.TopRight) {
                 return -1
             }
-            if (bthing == Quadrant.TopRight) {
+            if (bQuadrant == Quadrant.TopRight) {
                 return 1
             }
-            if (athing == Quadrant.BottomRight) {
+            if (aQuadrant == Quadrant.BottomRight) {
                 return -1
             }
-            if (bthing == Quadrant.BottomRight) {
+            if (bQuadrant == Quadrant.BottomRight) {
                 return 1
             }
-            if (athing == Quadrant.BottomLeft) {
+            if (aQuadrant == Quadrant.BottomLeft) {
                 return -1
             }
-            if (bthing == Quadrant.BottomLeft) {
+            if (bQuadrant == Quadrant.BottomLeft) {
                 return 1
             }
 
@@ -135,38 +118,6 @@ class Day10(override val adventOfCode: AdventOfCode) : Day {
                 it.y.toDouble() / it.x.toDouble()
             }
         fun slope() = this.y.toDouble() / this.x.toDouble()
-
-        fun isInLine(start: Point, other: Point) : Boolean {
-            val difference =
-                    (this - start).let {difference ->
-                        difference / difference.xyGCD()
-                    }
-
-
-            val thing = (other - start) / difference
-
-            if (thing.x == thing.y && thing.x > 0) {
-                val test = start + difference * thing
-                return other == test
-            }
-
-            if (difference.x == 0) {
-                if (start.x == other.x)
-                    return true
-            } else if (difference.y == 0) {
-                if (start.y == other.y)
-                    return true
-            } else {
-                val a = (other.x - start.x) / difference.x
-                val b = (other.y - start.y) / difference.y
-
-                if (a == b && a > 0) {
-                    val test = start + Point(difference.x*a, difference.y*a)
-                    return other == test
-                }
-            }
-            return false
-        }
     }
 
     fun inputSet() = mutableSetOf<Point>().also { asteroids ->
@@ -179,7 +130,7 @@ class Day10(override val adventOfCode: AdventOfCode) : Day {
         }
     }.toSet()
 
-    fun doTheThing(): Pair<Point, Set<Point>> {
+    fun findBase(): Pair<Point, Set<Point>> {
         val maxY = input.lastIndex
         val maxX = input.first().lastIndex
 
@@ -219,7 +170,7 @@ class Day10(override val adventOfCode: AdventOfCode) : Day {
     }
 
     override fun part1() : Any {
-        return doTheThing().second.size
+        return findBase().second.size
     }
 
     fun List<List<Point>>.getElement(num: Int) : Point {
@@ -235,102 +186,73 @@ class Day10(override val adventOfCode: AdventOfCode) : Day {
         return cur[toGo].first()
     }
 
-    fun SortedMap<Point, MutableList<Point>>.doThing(foo: Int) : Point {
-        var toGo = foo
-        while (toGo >= this.size) {
-            if (toGo == 1)
-                break
-            toGo -= this.size
-            val toDelete = mutableSetOf<Point>()
-            this.forEach { (index, b) ->
-                b.removeAt(0)
-                if (b.isEmpty())
-                    toDelete.add(index)
-            }
-
-            toDelete.forEach { this.remove(it) }
-        }
-
-        val sortedKeys = this.keys.toSortedSet(Comparator { a, b ->
-            val aslope = a.slope()
-            val bslope = b.slope()
-            when {
-                aslope > bslope -> 1
-                aslope < bslope -> -1
-                else -> 0
-            }
-        }).toMutableList()
-
-        return this[sortedKeys[toGo]]!!.first()
-    }
-
     override fun part2() : Any {
         val all = inputSet().toMutableSet()
-        println("Total asteroids to destroy ${all.size}")
-        val (base, _) = doTheThing()
 
+        val (base, _) = findBase()
         all.remove(base)
 
-        val dirs = all.groupBy { base.directionVector(it) }.mapValues { it.value.sortedBy { base.distance(it) }.toMutableList() }
-                //.map { Pair(base.slope(it), it) }.toList().sortedBy { it.first }
+        val dirs = all
+                .groupBy { base.directionVector(it) }
+                .mapValues { it.value.sortedBy { base.distance(it) } }
+                .map { (_, value) ->
+                    value
+                }
+                .sortedBy {
+                    base.directionVector(it.first())
+                }
 
-        val sortedList = dirs.map { it.value }.sortedBy {
-            val x = base.directionVector(it.first())
-            Point(x.x, -x.y)
-        }.toList()
+        val longest = dirs.maxBy { it.size }!!.size
 
-        var c = 0
-        sortedList.forEach {
-            print("Slope: ${base.directionVector(it.first()).slope()} = ")
-            it.forEach {
-                print("$it, ")
-                c++
-            }
-            print('\n')
+        val sortedList = mutableListOf<Point>()
+
+        for (i in 0..longest) {
+            dirs
+                    .filter { i < it.size }
+                    .forEach {
+                        sortedList.add(it[i])
+                    }
         }
 
-        println("List counted is $c")
+        //creatNiceString(base, all, sortedList, 18)
 
-        val sortedDirs = dirs.toSortedMap()
+        return sortedList[199].x * 100 + sortedList[199].y
+    }
 
-        println("Base is $base")
+    fun creatNiceString(base: Point, asteroids: Set<Point>, targetList: List<Point>, offset: Int) {
+        val maxY = input.size
+        val maxX = input.first().size
 
-        /*sortedDirs.entries.forEach { (dir, points) ->
-            print("[$dir] (${dir.slope()})= ")
-            points.forEach {
-                count++
-                print("$it, ")
-            }
-            print('\n')
-        }*/
-
-
-        //(0 until all.size).forEach { println(sortedList.getElement(it)) }
-
-        val foobard = sortedList.getElement(4)
-
-        println("Something")
-
-        val sorted = listOf(
-                Point(0, -1),
-                Point(1, -1),
-                Point(1, 0),
-                Point(1, 1),
-                Point(0, 1),
-                Point(-1, 1),
-                Point(-1, 0),
-                Point(-1, -1)
-        )
-
-        sorted.windowed(2, 1).forEach { (a, b) ->
-            //println("$a < $b ${a < b}")
+        val thing = List(maxY) { CharArray(maxX) { '.' } }
+        asteroids.forEach {
+            thing[it.y][it.x] = '#'
         }
 
-        val a =  Point(-1, 1)
-        val b = Point(-1, -1)
+        thing[base.y][base.x] = 'X'
 
-        println("a < b = ${a < b}")
+        for (i in 0..offset) {
+            if (i >= targetList.size)
+                break
+            val target = targetList[i]
+            thing[target.y][target.x] = '.'
+        }
 
-        return foobard.x * 100 + foobard.y
+        for (i in 0..8) {
+            if (i >= targetList.size)
+                break
+            val target = targetList[offset+i]
+            thing[target.y][target.x] = (i + '1'.toInt()).toChar()
+        }
+
+        buildString {
+            thing.forEach { row ->
+                row.forEach { char ->
+                    this.append(char)
+                }
+                this.append('\n')
+            }
+        }.let {
+            print(it)
+        }
     }
 }

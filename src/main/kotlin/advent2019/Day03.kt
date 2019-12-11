@@ -12,6 +12,13 @@ fun abs(x: Int) = if (x >= 0) x else -x
 data class Vector(val dir: Direction, val vel: Int)
 
 data class Point(val x: Int, val y: Int) {
+    operator fun minus(other: Point) : Point = Point(this.x - other.x, this.y - other.y)
+    operator fun plus(other: Point) : Point = Point(this.x + other.x, this.y + other.y)
+    operator fun div(mult: Int) : Point = Point(this.x/mult, this.y/mult)
+    operator fun div(other: Point) : Point = Point(this.x/other.x, this.y/other.y)
+    operator fun times(other: Point) : Point = Point(this.x*other.x, this.y*other.y)
+    operator fun times(mult: Int) : Point = Point(this.x*mult, this.y*mult)
+
     fun walk(dir: Direction) : Point {
         return when (dir) {
             Direction.UP -> Point(x, y+1)
