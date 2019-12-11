@@ -16,57 +16,58 @@ class Day11(override val adventOfCode: AdventOfCode) : Day {
         White;
 
         companion object {
-            fun fromLong(long: Long) : Colour {
-                return when (long) {
-                    0L -> Black
-                    1L -> White
-                    else -> throw IllegalStateException("This can't happen!")
+            fun fromLong(long: Long) : Colour =
+                    when (long) {
+                        0L -> Black
+                        1L -> White
+                        else -> throw IllegalStateException("This can't happen!")
+                    }
+        }
+
+        fun toLong() : Long =
+                when (this) {
+                    Black -> 0L
+                    White -> 1L
                 }
-            }
-        }
 
-        fun toLong() : Long {
-            return when (this) {
-                Black -> 0L
-                White -> 1L
-            }
-        }
 
-        fun toChar() : Char {
-            return when (this) {
-                Black -> '░'
-                White -> '█'
-            }
-        }
+
+        fun toChar() : Char =
+                when (this) {
+                    Black -> '░'
+                    White -> '█'
+                }
     }
 
-    fun Point.turnRight() : Point {
-        return when (this) {
-            Point(0 ,-1) -> Point(1, 0)
-            Point(1 ,0) -> Point(0, 1)
-            Point(0 ,1) -> Point(-1, 0)
-            Point(-1 ,0) -> Point(0, -1)
-            else -> throw IllegalStateException("$this not a valid direction")
-        }
-    }
+    fun Point.turnRight() : Point =
+            when (this) {
+                Point(0 ,-1) -> Point(1, 0)
+                Point(1 ,0) -> Point(0, 1)
+                Point(0 ,1) -> Point(-1, 0)
+                Point(-1 ,0) -> Point(0, -1)
+                else -> throw IllegalStateException("$this not a valid direction")
+            }
 
-    fun Point.turnLeft() : Point {
-        return when (this) {
-            Point(0 ,-1) -> Point(-1, 0)
-            Point(1 ,0) -> Point(0, -1)
-            Point(0 ,1) -> Point(1, 0)
-            Point(-1 ,0) -> Point(0, 1)
-            else -> throw IllegalStateException("$this not a valid direction")
-        }
-    }
 
-    override fun part1() : Any = runBlocking {
+    fun Point.turnLeft() : Point =
+            when (this) {
+                Point(0 ,-1) -> Point(-1, 0)
+                Point(1 ,0) -> Point(0, -1)
+                Point(0 ,1) -> Point(1, 0)
+                Point(-1 ,0) -> Point(0, 1)
+                else -> throw IllegalStateException("$this not a valid direction")
+            }
+
+
+    fun runRobot(hull: Map<Point, Colour> = mapOf()) = runBlocking {
         val ret = mutableMapOf<Point, Colour>()
+
+        hull.forEach { (i, colour) ->
+            ret[i] = colour
+        }
 
         var dir = Point(0, -1)
         var curPos = Point(0, 0)
-
-        ret[curPos] = Colour.White
 
         val inCh = Channel<Long>()
         val outCh = Channel<Long>()
@@ -104,14 +105,20 @@ class Day11(override val adventOfCode: AdventOfCode) : Day {
 
         vmRunner.join()
 
-        vm
+        ret
+    }
+
+    override fun part1() = runRobot().size
+
+    override fun part2() : Any {
+        val ret = runRobot(mapOf(Pair(Point(0, 0), Colour.White)))
 
         val maxX = ret.keys.maxBy { it.x }!!.x
         val minX = ret.keys.minBy { it.x }!!.x
         val maxY = ret.keys.maxBy { it.y }!!.y
         val minY = ret.keys.minBy { it.y }!!.y
 
-        buildString {
+        return buildString {
             this.append('\n')
             for (y in minY..maxY) {
                 for (x in minX..maxX) {
@@ -127,9 +134,5 @@ class Day11(override val adventOfCode: AdventOfCode) : Day {
                 this.append('\n')
             }
         }
-    }
-
-    override fun part2() : Any {
-        return ""
     }
 }
