@@ -24,6 +24,23 @@ class Day12(override val adventOfCode: AdventOfCode) : Day {
         }
     }
 
+    data class MutableVector(var x: Int, var y: Int, var z: Int) : Comparable<Vector> {
+        fun add(other: MutableVector) {
+            x += other.x
+            y += other.y
+            z += other.z
+        }
+
+        fun sub(other: MutableVector) {
+            x -= other.x
+            y -= other.y
+            z -= other.z
+        }
+
+        override fun compareTo(other: Vector): Int {
+            return this.x + this.y + this.z - other.x - other.y - other.z
+        }
+    }
     fun Vector.energy() : Int = abs(x) + abs(y) + abs(z)
 
     fun Vector.direction(other: Vector) : Vector {
@@ -58,9 +75,7 @@ class Day12(override val adventOfCode: AdventOfCode) : Day {
             .map { Vector(it[0], it[1], it[2]) }
             .toList()
 
-    data class Moon(val position: Vector, val velocity: Vector) {
-
-    }
+    data class Moon(val position: Vector, val velocity: Vector)
 
     override fun part1() : Any {
         var cur = input.toMutableList().map { Pair(it, Vector(0,0,0)) }.toMap().toMutableMap()
@@ -84,32 +99,30 @@ class Day12(override val adventOfCode: AdventOfCode) : Day {
     }
 
     override fun part2() : Any {
-        val startingPos = input.toMutableList().map { Pair(it, Vector(0,0,0)) }.toMap()
+        val offsets = MutableList(input.size) { Vector(0, 0, 0) }
+        val velocities = MutableList(input.size) { Vector(0, 0, 0) }
 
-        println(startingPos)
+        val indexCombinations = (0 until input.size).toList().combinations(2)
 
         var flag = true
 
-        var cur = startingPos.toMutableMap()
-
-        val count = whileCount({ startingPos != cur || flag }) {
+        val count = whileCount({ offsets.sumBy { it.energy() } != 0 || flag }) {
             flag = false
 
-            cur.keys.combinations(2).forEach { (first, second) ->
-                val firstDir = first.direction(second)
+            indexCombinations.forEach { (first, second) ->
+                val pos1 = input[first] + offsets[first]
+                val pos2 = input[second] + offsets[second]
 
-                cur[first] = cur[first]!! + firstDir
-                cur[second] = cur[second]!! - firstDir
+                val firstDir = pos1.direction(pos2)
+
+                velocities[first] += firstDir
+                velocities[second] -= firstDir
             }
 
-            /*cur.forEach { pos, vec ->
-                println("Pos: $pos, Vec: $vec")
-            }*/
-
-            cur = cur.mapKeys { (key, value) -> key + value }.toMutableMap()
+            (0 until offsets.size).forEach { i ->
+                offsets[i] += velocities[i]
+            }
         }
-
-        println(cur)
 
         return count
     }
