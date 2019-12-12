@@ -84,12 +84,16 @@ class Day12(override val adventOfCode: AdventOfCode) : Day {
     }
 
     override fun part2() : Any {
-        var cur = input.toMutableList().map { Pair(it, Vector(0,0,0)) }.toMap().toMutableMap()
+        val startingPos = input.toMutableList().map { Pair(it, Vector(0,0,0)) }.toMap()
 
-        val seen = mutableSetOf<Map<Vector, Vector>>()
+        println(startingPos)
 
-        return whileCount({ cur !in seen }) {
-            seen.add(cur.toMap())
+        var flag = true
+
+        var cur = startingPos.toMutableMap()
+
+        val count = whileCount({ startingPos != cur || flag }) {
+            flag = false
 
             cur.keys.combinations(2).forEach { (first, second) ->
                 val firstDir = first.direction(second)
@@ -104,5 +108,9 @@ class Day12(override val adventOfCode: AdventOfCode) : Day {
 
             cur = cur.mapKeys { (key, value) -> key + value }.toMutableMap()
         }
+
+        println(cur)
+
+        return count
     }
 }
