@@ -59,6 +59,8 @@ class Intcode(
         val input: ReceiveChannel<Long> = Channel(),
         val output: SendChannel<Long> = Channel(),
         val name: String = "",
+        val requestInput: SendChannel<Unit> = Channel(),
+        val blockOnInputRequest: Boolean = false,
         val debug: Boolean = false
 ) {
     val out = mutableListOf<Long>()
@@ -192,6 +194,8 @@ class Intcode(
                 OperationResult.IncrementIP
             }
             Instruction.Read -> {
+                if (blockOnInputRequest)
+                    requestInput.send(Unit)
                 getIndex(1).write(input.receive())
                 OperationResult.IncrementIP
             }

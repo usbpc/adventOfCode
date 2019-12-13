@@ -44,24 +44,10 @@ class Day12(override val adventOfCode: AdventOfCode) : Day {
     fun Vector.energy() : Int = abs(x) + abs(y) + abs(z)
 
     fun Vector.direction(other: Vector) : Vector {
-        val x =
-                when {
-                    this.x > other.x -> -1
-                    this.x < other.x -> 1
-                    else -> 0
-                }
-        val y =
-                when {
-                    this.y > other.y -> -1
-                    this.y < other.y -> 1
-                    else -> 0
-                }
-        val z =
-                when {
-                    this.z > other.z -> -1
-                    this.z < other.z -> 1
-                    else -> 0
-                }
+
+        val x = Integer.signum(other.x - this.x)
+        val y = Integer.signum(other.y - this.y)
+        val z = Integer.signum(other.z - this.z)
 
         return Vector(x, y, z)
     }
@@ -98,17 +84,19 @@ class Day12(override val adventOfCode: AdventOfCode) : Day {
         return cur.map { (key, value) -> key.energy() * value.energy() }.sum()
     }
 
+
+
     override fun part2() : Any {
         val offsets = MutableList(input.size) { Vector(0, 0, 0) }
         val velocities = MutableList(input.size) { Vector(0, 0, 0) }
 
-        val indexCombinations = (0 until input.size).toList().combinations(2)
+        val indexCombinations = (input.indices).toList().combinations(2)
 
-        var flag = true
+        var xRepeat = 0L
+        var yRepeat = 0L
+        var zRepeat = 0L
 
-        val count = whileCount({ offsets.sumBy { it.energy() } != 0 || flag }) {
-            flag = false
-
+        outer@for (i in 1L..Long.MAX_VALUE) {
             indexCombinations.forEach { (first, second) ->
                 val pos1 = input[first] + offsets[first]
                 val pos2 = input[second] + offsets[second]
@@ -118,12 +106,33 @@ class Day12(override val adventOfCode: AdventOfCode) : Day {
                 velocities[first] += firstDir
                 velocities[second] -= firstDir
             }
+            //println("-------------------------------------")
+            for (j in 0 until offsets.size) {
+                //print("pos=${input[i] + offsets[i]} vel=${-velocities[i]}\t")
+                offsets[j] += velocities[j]
 
-            (0 until offsets.size).forEach { i ->
-                offsets[i] += velocities[i]
+                //print("pos=${input[j] + offsets[j]} vel=${velocities[j]}\n")
+
+                if (xRepeat == 0L && velocities.all { it.x == 0 } && offsets.all { it.x == 0 }) {
+                    xRepeat = i
+                }
+
+                if (yRepeat == 0L && velocities.all { it.y == 0 } && offsets.all { it.y == 0 } ) {
+                    yRepeat = i
+                }
+
+                if (zRepeat == 0L && velocities.all { it.z == 0 } && offsets.all { it.z == 0 }) {
+                    zRepeat = i
+                }
+
+                if (zRepeat != 0L && yRepeat != 0L && zRepeat != 0L) {
+                    println("xrepeat: $xRepeat, yrepeat: $yRepeat, zrepeat: $zRepeat")
+                    println("$xRepeat $yRepeat $zRepeat")
+                    break@outer
+                }
             }
         }
 
-        return count
+        return ""
     }
 }

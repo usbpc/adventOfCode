@@ -3,8 +3,6 @@ package xyz.usbpc.utils
 inline fun whileCount(condition: () -> Boolean, block: () -> Unit): Long {
     var counter = 0L
     while (condition()) {
-        if (counter % 1_000_000 == 0L)
-            println(counter / 1_000_000)
         counter++
         block()
     }
