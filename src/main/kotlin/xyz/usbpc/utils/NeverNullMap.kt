@@ -7,4 +7,8 @@ class NeverNullMap<K, V> private constructor(private val backing: MutableMap<K, 
 
     override operator fun get(key: K): V = backing.getOrPut(key, default)
     operator fun set(key: K, value: V) = backing.put(key, value)
+
+    override fun toString(): String {
+        return backing.toString()
+    }
 }
