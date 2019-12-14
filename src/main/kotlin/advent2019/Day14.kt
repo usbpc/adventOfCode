@@ -12,8 +12,8 @@ class Day14(override val adventOfCode: AdventOfCode) : Day {
     val input = adventOfCode.getInput(2019, day).lines()
 
 
-    data class Element(val quantity: Int, val name: String) {
-        val producedBy = mutableMapOf<Element, Int>()
+    data class Element(val quantity: Long, val name: String) {
+        val producedBy = mutableMapOf<Element, Long>()
 
         fun distanceToOre() : Int {
             if (name == "ORE")
@@ -43,8 +43,7 @@ class Day14(override val adventOfCode: AdventOfCode) : Day {
         }
     }
 
-    override fun part1() : Any {
-
+    fun generateElementMap() : Map<String, Element> {
         val elemMap = mutableMapOf<String, Element>()
 
         elemMap["ORE"] = Element(1, "ORE")
@@ -53,7 +52,7 @@ class Day14(override val adventOfCode: AdventOfCode) : Day {
             val (_, output) = line.split("=>")
 
             val (outName, outQty) = regex.find(output)!!.let {
-                Pair(it.groups[2]!!.value, it.groups[1]!!.value.toInt())
+                Pair(it.groups[2]!!.value, it.groups[1]!!.value.toLong())
             }
 
             elemMap[outName] = Element(outQty, outName)
@@ -64,12 +63,12 @@ class Day14(override val adventOfCode: AdventOfCode) : Day {
             val splitInputs = inputs.split(",")
 
             val (outName, _) = regex.find(output)!!.let {
-                Pair(it.groups[2]!!.value, it.groups[1]!!.value.toInt())
+                Pair(it.groups[2]!!.value, it.groups[1]!!.value.toLong())
             }
 
             splitInputs.map {
                 regex.find(it)!!.let {
-                    Pair(it.groups[2]!!.value, it.groups[1]!!.value.toInt())
+                    Pair(it.groups[2]!!.value, it.groups[1]!!.value.toLong())
                 }
             }.forEach { (elemName, qty) ->
                 elemMap[elemName]!!.let { toProduce ->
@@ -78,9 +77,15 @@ class Day14(override val adventOfCode: AdventOfCode) : Day {
             }
         }
 
-        val needed = NeverNullMap<Element, Int> {0}
+        return elemMap
+    }
 
-        needed[elemMap["FUEL"]!!] = 1
+    fun getOreRequired(fuelWanted: Long) : Long {
+        val elemMap = generateElementMap()
+
+        val needed = NeverNullMap<Element, Long> {0}
+
+        needed[elemMap["FUEL"]!!] = fuelWanted
 
         while (!needed.containsKey(elemMap["ORE"]!!) || needed.size > 1) {
             val cur = needed.keys.maxBy { it.distanceToOre() }!!
@@ -89,7 +94,7 @@ class Day14(override val adventOfCode: AdventOfCode) : Day {
             needed.remove(cur)
 
             var timesNeeded = quantity / cur.quantity
-            if (quantity % cur.quantity != 0)
+            if (quantity % cur.quantity != 0L)
                 timesNeeded += 1
 
             cur.producedBy.forEach { (elem, qty) ->
@@ -100,7 +105,26 @@ class Day14(override val adventOfCode: AdventOfCode) : Day {
         return needed.values.single()
     }
 
+    override fun part1(): Any = getOreRequired(1)
+
     override fun part2() : Any {
-        return ""
+        var upper = 1000000000000L
+        var lower = 1000000000000L / getOreRequired(1)
+
+
+
+        while (upper - lower > 1) {
+            val middle = (upper + lower) / 2
+
+            val oreRequired = getOreRequired(middle)
+
+            if (oreRequired > 1000000000000L) {
+                upper = middle
+            } else {
+                lower = middle
+            }
+        }
+
+        return lower
     }
 }
