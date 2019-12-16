@@ -4,13 +4,14 @@ import xyz.usbpc.aoc.Day
 import xyz.usbpc.aoc.inputgetter.AdventOfCode
 import xyz.usbpc.utils.repeat
 import java.lang.StringBuilder
-import kotlin.math.max
+import kotlin.math.min
 
 class Day16(override val adventOfCode: AdventOfCode) : Day {
     override val day = 16
 
     val input = adventOfCode.getInput(2019, day).map { Character.getNumericValue(it) }
     //val input = "12345678".map { Character.getNumericValue(it) }
+    //val input = "02935109699940807407585447034323".map { Character.getNumericValue(it) }
 
     class PatternGenerator(val num: Int): Iterator<Int>, Iterable<Int> {
         override fun iterator(): Iterator<Int> = this
@@ -123,45 +124,49 @@ class Day16(override val adventOfCode: AdventOfCode) : Day {
         val ret = mutableListOf<List<E>>()
         var cur = 0
         while (cur < this.size) {
-            ret.add(this.subList(cur, kotlin.math.min(cur+size, this.size)))
+            ret.add(this.subList(cur, min(cur+size, this.size)))
             cur += step
         }
         return ret
     }
 
     override fun part2() : Any {
-        //var cur = input.toMutableList()
-        //var other = input.toMutableList()
-        var cur = input.repeat(10_000).flatten().toMutableList()
-        var other = cur.toMutableList()
+        //val cur = input.toMutableList()
+        val cur = input.repeat(10_000).flatten().toMutableList()
+        val list = IntArray(cur.size+1)
+
 
         //println(ranges.first().first)
 
         repeat(100) {
-            var counter = 0
-            for (i in 0..cur.lastIndex) {
-                if (i % 100 == 0) {
-                    println("${counter} done, of $it iterations.")
-                    counter += 100
-                }
-                val pos = cur.subList(i, cur.size).subListWindowed(i+1, 4*(i+1)).map { it.sum() }.sum()
-                val neg = if (3*i + 2 >= cur.size) {
-                    0
-                } else {
-                    cur.subList(3*i + 2, cur.size).subListWindowed(i+1, 4*(i+1)).map { it.sum() }.sum()
-                }
-                //println("pos: $pos, neg $neg")
-                other[i] = (pos - neg) absmod 10
+            println("Am in iteration $it")
+            list[list.lastIndex-1] = cur.last()
+            for (i in cur.size-2 downTo 0) {
+                list[i] = list[i+1] + cur[i]
             }
-            val tmp = cur
-            cur = other
-            other = tmp
-            //println(cur)
+           for (pos in 0 until cur.size) {
+               var chunk = pos
+               var tmp = 0
+               while (chunk < cur.size) {
+
+                   tmp += list[chunk] - list[min(chunk + pos, cur.lastIndex)+1]
+
+                   chunk += (pos+1) * 2
+
+                   if (chunk >= cur.size)
+                       continue
+
+                   tmp -= list[chunk] - list[min(chunk + pos, cur.lastIndex)+1]
+
+                   chunk += (pos+1) * 2
+               }
+               cur[pos] = abs(tmp % 10)
+           }
         }
 
         val toSkip = input.take(7).fold( StringBuilder() ) { builder, i -> builder.append(i) }.toString().toInt()
 
         //return cur.take(8).fold(StringBuilder()) { a, b -> a.append(b) }
-        return cur.subList(toSkip-1, toSkip+8).fold(StringBuilder()) { a, b -> a.append(b) }
+        return cur.subList(toSkip, toSkip+8).fold(StringBuilder()) { a, b -> a.append(b) }
     }
 }
